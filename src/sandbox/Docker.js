@@ -1,8 +1,8 @@
-import { exec } from 'child_process';
+import { execFile, execSync } from 'child_process';
 import { promisify } from 'util';
-import crypto from 'crypto';
+import { randomBytes } from 'crypto';
 
-const execAsync = promisify(exec);
+const execFileAsync = promisify(execFile);
 
 const activeSandboxes = new Set();
 
@@ -11,7 +11,7 @@ function cleanupAll() {
   for (const name of activeSandboxes) {
     try {
       // Synchronous cleanup for signal handlers
-      require('child_process').execSync(`docker rm -f ${name} 2>/dev/null`);
+      execSync(`docker rm -f ${name} 2>/dev/null`);
     } catch (e) {
       // ignore
     }
@@ -23,7 +23,7 @@ process.on('exit', cleanupAll);
 
 class DockerSandbox {
   constructor(options = {}) {
-    this.name = options.name || `devfix-sandbox-${crypto.randomBytes(4).toString('hex')}`;
+    this.name = options.name || `devfix-sandbox-${randomBytes(4).toString('hex')}`;
     this.image = options.image || 'node:20-alpine';
     this.memory = options.memory || '512m';
     this.cpus = options.cpus || '1.0';
@@ -35,18 +35,28 @@ class DockerSandbox {
   async start() {
     activeSandboxes.add(this.name);
     try {
-      await execAsync(`docker rm -f ${this.name} 2>/dev/null`);
+      await execFileAsync('docker', ['rm', '-f', this.name]);
     } catch (e) {
       // ignore
     }
-    const cmd = `docker run -d --name ${this.name} --memory="${this.memory}" --cpus="${this.cpus}" --pids-limit=${this.pidsLimit} --security-opt="no-new-privileges=true" -w ${this.workdir} ${this.image} sleep 360000`;
-    await execAsync(cmd);
+    const args = [
+      'run', '-d',
+      '--name', this.name,
+      `--memory=${this.memory}`,
+      `--cpus=${this.cpus}`,
+      `--pids-limit=${this.pidsLimit}`,
+      '--security-opt=no-new-privileges=true',
+      '-w', this.workdir,
+      this.image,
+      'sleep', '360000'
+    ];
+    await execFileAsync('docker', args);
   }
 
   async stop() {
     activeSandboxes.delete(this.name);
     try {
-      await execAsync(`docker rm -f ${this.name}`);
+      await execFileAsync('docker', ['rm', '-f', this.name]);
     } catch (e) {
       // ignore
     }
@@ -58,10 +68,10 @@ class DockerSandbox {
       // Use 'timeout' inside the container to reliably kill the process and return 124.
       // If we only use Node's timeout, docker exec detaches and leaves the process running.
       const timeoutSec = Math.ceil(timeoutMs / 1000);
-      const execCmd = `docker exec ${this.name} timeout ${timeoutSec} sh -c ${JSON.stringify(command)}`;
+      const args = ['exec', this.name, 'timeout', String(timeoutSec), 'sh', '-c', command];
       
       // Node fallback timeout slightly larger than container timeout
-      const { stdout, stderr } = await execAsync(execCmd, { timeout: timeoutMs + 2000, maxBuffer: 5 * 1024 * 1024 });
+      const { stdout, stderr } = await execFileAsync('docker', args, { timeout: timeoutMs + 2000, maxBuffer: 5 * 1024 * 1024 });
       return {
         exit_code: 0,
         stdout,
@@ -84,7 +94,14 @@ class DockerSandbox {
 
   // Used to populate initial state (e.g. benchmark setup)
   async executeHostCommand(command) {
-     return execAsync(`docker exec ${this.name} sh -c ${JSON.stringify(command)}`);
+     const args = ['exec', this.name, 'sh', '-c', command];
+     return execFileAsync('docker', args);
+  }
+
+  // Execute a command in the background (detached)
+  async executeDetached(command) {
+     const args = ['exec', '-d', this.name, 'sh', '-c', command];
+     return execFileAsync('docker', args);
   }
 }
 
