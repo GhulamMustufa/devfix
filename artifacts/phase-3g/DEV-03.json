@@ -1,0 +1,234 @@
+{
+  "baseline": {
+    "success": false,
+    "reason": "Baseline attempted tool call",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "EADDRINUSE :::8080\n",
+          "duration_ms": 132
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 701,
+      "toolLatency": 0,
+      "iterations": 1,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 288,
+      "completion": 20,
+      "total": 308
+    },
+    "calls": {
+      "total": 0,
+      "valid": 0,
+      "successful": 0,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [],
+    "time": 834
+  },
+  "agent": {
+    "success": false,
+    "reason": "Max Iterations Reached",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "EADDRINUSE :::8080\n",
+          "duration_ms": 124
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "lsof -i :8080"
+        },
+        "latency": 809,
+        "iteration": 1
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "1\t/bin/busybox\t0\t/dev/null\n1\t/bin/busybox\t1\tpipe:[1157239]\n1\t/bin/busybox\t2\tpipe:[1157240]\n20\t/usr/local/bin/node\t0\t/dev/null\n20\t/usr/local/bin/node\t1\tpipe:[1154530]\n20\t/usr/local/bin/node\t2\tpipe:[1154531]\n20\t/usr/local/bin/node\t3\tanon_inode:[eventpoll]\n20\t/usr/local/bin/node\t4\tpipe:[1154538]\n20\t/usr/local/bin/node\t5\tpipe:[1154538]\n20\t/usr/local/bin/node\t6\tpipe:[1154539]\n20\t/usr/local/bin/node\t7\tpipe:[1154539]\n20\t/usr/local/bin/node\t8\tanon_inode:[eventfd]\n20\t/usr/local/bin/node\t9\tanon_inode:[eventpoll]\n20\t/usr/local/bin/node\t10\tpipe:[1151799]\n20\t/usr/local/bin/node\t11\tpipe:[1151799]\n20\t/usr/local/bin/node\t12\tanon_inode:[eventfd]\n20\t/usr/local/bin/node\t13\tanon_inode:[eventpoll]\n20\t/usr/local/bin/node\t14\tpipe:[1154542]\n20\t/usr/local/bin/node\t15\tpipe:[1154542]\n20\t/usr/local/bin/node\t16\tanon_inode:[eventfd]\n20\t/usr/local/bin/node\t17\t/dev/null\n20\t/usr/local/bin/node\t18\tsocket:[1154545]\n",
+          "stderr": "",
+          "duration_ms": 110
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "ps aux | grep node"
+        },
+        "latency": 812,
+        "iteration": 2
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "   20 root      0:00 node bg.js\n   57 root      0:00 sh -c ps aux | grep node\n",
+          "stderr": "",
+          "duration_ms": 108
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "kill 20"
+        },
+        "latency": 758,
+        "iteration": 3
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 115
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "node index.js"
+        },
+        "latency": 716,
+        "iteration": 4
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "Command timed out",
+          "duration_ms": 10014
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "lsof -i :8080"
+        },
+        "latency": 743,
+        "iteration": 5
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "1\t/bin/busybox\t0\t/dev/null\n1\t/bin/busybox\t1\tpipe:[1157239]\n1\t/bin/busybox\t2\tpipe:[1157240]\n71\t/usr/local/bin/node\t0\t/dev/null\n71\t/usr/local/bin/node\t1\tpipe:[1156773]\n71\t/usr/local/bin/node\t2\tpipe:[1156774]\n71\t/usr/local/bin/node\t3\tanon_inode:[eventpoll]\n71\t/usr/local/bin/node\t4\tpipe:[1151853]\n71\t/usr/local/bin/node\t5\tpipe:[1151853]\n71\t/usr/local/bin/node\t6\tpipe:[1151854]\n71\t/usr/local/bin/node\t7\tpipe:[1151854]\n71\t/usr/local/bin/node\t8\tanon_inode:[eventfd]\n71\t/usr/local/bin/node\t9\tanon_inode:[eventpoll]\n71\t/usr/local/bin/node\t10\tpipe:[1158379]\n71\t/usr/local/bin/node\t11\tpipe:[1158379]\n71\t/usr/local/bin/node\t12\tanon_inode:[eventfd]\n71\t/usr/local/bin/node\t13\tanon_inode:[eventpoll]\n71\t/usr/local/bin/node\t14\tpipe:[1151856]\n71\t/usr/local/bin/node\t15\tpipe:[1151856]\n71\t/usr/local/bin/node\t16\tanon_inode:[eventfd]\n71\t/usr/local/bin/node\t17\t/dev/null\n71\t/usr/local/bin/node\t18\tsocket:[1151857]\n",
+          "stderr": "",
+          "duration_ms": 140
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "kill -9 71"
+        },
+        "latency": 769,
+        "iteration": 6
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 153
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "node index.js"
+        },
+        "latency": 788,
+        "iteration": 7
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "Command timed out",
+          "duration_ms": 10019
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "lsof -i :8080"
+        },
+        "latency": 1719,
+        "iteration": 8
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "error": "DUPLICATE_ACTION_DETECTED: You have run this exact command multiple times. Try something else."
+        }
+      },
+      {
+        "event_type": "verify_final",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "EADDRINUSE :::8080\n",
+          "duration_ms": 185
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 7114,
+      "toolLatency": 20659,
+      "iterations": 8,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 7129,
+      "completion": 144,
+      "total": 7273
+    },
+    "calls": {
+      "total": 8,
+      "valid": 7,
+      "successful": 5,
+      "malformed": 1
+    },
+    "safety_events": [],
+    "failures": [
+      "TOOL_CALL_FAILURE",
+      "TOOL_CALL_FAILURE",
+      "TIMEOUT"
+    ],
+    "time": 28083
+  }
+}

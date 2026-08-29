@@ -1,0 +1,243 @@
+{
+  "baseline": {
+    "success": false,
+    "reason": "Baseline attempted tool call",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Missing DATABASE_URL\n",
+          "duration_ms": 315
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 1149,
+      "toolLatency": 0,
+      "iterations": 1,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 278,
+      "completion": 15,
+      "total": 293
+    },
+    "calls": {
+      "total": 0,
+      "valid": 0,
+      "successful": 0,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [],
+    "time": 1464
+  },
+  "agent": {
+    "success": false,
+    "reason": "Max Iterations Reached",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Missing DATABASE_URL\n",
+          "duration_ms": 120
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": "index.js"
+        },
+        "latency": 811,
+        "iteration": 1
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "const db = process.env.DATABASE_URL; if (!db) { console.error('Missing DATABASE_URL'); process.exit(1); } console.log('App started');\n",
+          "stderr": "",
+          "duration_ms": 96
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": ".env"
+        },
+        "latency": 850,
+        "iteration": 2
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "cat: can't open '.env': No such file or directory\n",
+          "duration_ms": 122
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "touch .env"
+        },
+        "latency": 781,
+        "iteration": 3
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 108
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "patch_file",
+        "args": {
+          "filepath": ".env",
+          "start_line": 1,
+          "end_line": 1,
+          "replacement": "DATABASE_URL=your_database_url_here"
+        },
+        "latency": 856,
+        "iteration": 4
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "patch_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 135
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "node index.js"
+        },
+        "latency": 739,
+        "iteration": 5
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Missing DATABASE_URL\n",
+          "duration_ms": 168
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": ".env"
+        },
+        "latency": 867,
+        "iteration": 6
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 101
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "cat .env"
+        },
+        "latency": 1222,
+        "iteration": 7
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 67
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "patch_file",
+        "args": {
+          "filepath": ".env",
+          "start_line": 1,
+          "end_line": 1,
+          "replacement": "DATABASE_URL=your_database_url_here"
+        },
+        "latency": 1383,
+        "iteration": 8
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "patch_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 102
+        }
+      },
+      {
+        "event_type": "verify_final",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "Missing DATABASE_URL\n",
+          "duration_ms": 118
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 7509,
+      "toolLatency": 899,
+      "iterations": 8,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 3784,
+      "completion": 269,
+      "total": 4053
+    },
+    "calls": {
+      "total": 8,
+      "valid": 8,
+      "successful": 6,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [
+      "TOOL_CALL_FAILURE",
+      "TOOL_CALL_FAILURE",
+      "TIMEOUT"
+    ],
+    "time": 8647
+  }
+}

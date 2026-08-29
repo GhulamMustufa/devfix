@@ -1,0 +1,258 @@
+{
+  "baseline": {
+    "success": false,
+    "reason": "Baseline attempted tool call",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 127,
+          "stdout": "\n> start\n> tsc && node dist/server.js\n\n",
+          "stderr": "sh: tsc: not found\n",
+          "duration_ms": 590
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 721,
+      "toolLatency": 0,
+      "iterations": 1,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 293,
+      "completion": 19,
+      "total": 312
+    },
+    "calls": {
+      "total": 0,
+      "valid": 0,
+      "successful": 0,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [],
+    "time": 1311
+  },
+  "agent": {
+    "success": false,
+    "reason": "Max Iterations Reached",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 127,
+          "stdout": "\n> start\n> tsc && node dist/server.js\n\n",
+          "stderr": "sh: tsc: not found\n",
+          "duration_ms": 431
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "npm install -g typescript"
+        },
+        "latency": 763,
+        "iteration": 1
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "\nadded 2 packages in 4s\n",
+          "stderr": "",
+          "duration_ms": 4082
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "npm start"
+        },
+        "latency": 1144,
+        "iteration": 2
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 2,
+          "stdout": "\n> start\n> tsc && node dist/server.js\n\nindex.ts(1,5): error TS2322: Type 'number' is not assignable to type 'string'.\n",
+          "stderr": "Command failed: docker exec DEV-05 sh -c \"npm start\"",
+          "duration_ms": 510
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": "index.ts"
+        },
+        "latency": 1119,
+        "iteration": 3
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "let port: string = 3000; console.log(port);\n",
+          "stderr": "",
+          "duration_ms": 129
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "patch_file",
+        "args": {
+          "filepath": "index.ts",
+          "start_line": 1,
+          "end_line": 1,
+          "replacement": "let port: string = \"3000\"; console.log(port);"
+        },
+        "latency": 1032,
+        "iteration": 4
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "patch_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 108
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "npm start"
+        },
+        "latency": 1032,
+        "iteration": 4
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "\n> start\n> tsc && node dist/server.js\n\n",
+          "stderr": "node:internal/modules/cjs/loader:1210\n  throw err;\n  ^\n\nError: Cannot find module '/app/dist/server.js'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)\n    at Module._load (node:internal/modules/cjs/loader:1038:27)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)\n    at node:internal/main/run_main_module:28:49 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v20.20.2\n",
+          "duration_ms": 410
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "tsc"
+        },
+        "latency": 799,
+        "iteration": 5
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "",
+          "stderr": "",
+          "duration_ms": 353
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "npm start"
+        },
+        "latency": 858,
+        "iteration": 6
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "error": "DUPLICATE_ACTION_DETECTED: You have run this exact command multiple times. Try something else."
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "node dist/server.js"
+        },
+        "latency": 819,
+        "iteration": 7
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "node:internal/modules/cjs/loader:1210\n  throw err;\n  ^\n\nError: Cannot find module '/app/dist/server.js'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)\n    at Module._load (node:internal/modules/cjs/loader:1038:27)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)\n    at node:internal/main/run_main_module:28:49 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v20.20.2\n",
+          "duration_ms": 144
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "npm run build"
+        },
+        "latency": 728,
+        "iteration": 8
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 1,
+          "stdout": "",
+          "stderr": "npm error Missing script: \"build\"\nnpm error\nnpm error To see a list of scripts, run:\nnpm error   npm run\nnpm error A complete log of this run can be found in: /root/.npm/_logs/2026-08-29T07_24_52_278Z-debug-0.log\n",
+          "duration_ms": 214
+        }
+      },
+      {
+        "event_type": "verify_final",
+        "result": {
+          "exit_code": 1,
+          "stdout": "\n> start\n> tsc && node dist/server.js\n\n",
+          "stderr": "node:internal/modules/cjs/loader:1210\n  throw err;\n  ^\n\nError: Cannot find module '/app/dist/server.js'\n    at Module._resolveFilename (node:internal/modules/cjs/loader:1207:15)\n    at Module._load (node:internal/modules/cjs/loader:1038:27)\n    at Function.executeUserEntryPoint [as runMain] (node:internal/modules/run_main:164:12)\n    at node:internal/main/run_main_module:28:49 {\n  code: 'MODULE_NOT_FOUND',\n  requireStack: []\n}\n\nNode.js v20.20.2\n",
+          "duration_ms": 392
+        }
+      }
+    ],
+    "stats": {
+      "apiLatency": 7262,
+      "toolLatency": 5950,
+      "iterations": 8,
+      "rate_limit_wait_ms": 0
+    },
+    "tokens": {
+      "prompt": 5133,
+      "completion": 185,
+      "total": 5318
+    },
+    "calls": {
+      "total": 9,
+      "valid": 8,
+      "successful": 4,
+      "malformed": 1
+    },
+    "safety_events": [],
+    "failures": [
+      "TOOL_CALL_FAILURE",
+      "TOOL_CALL_FAILURE",
+      "TOOL_CALL_FAILURE",
+      "TOOL_CALL_FAILURE",
+      "TIMEOUT"
+    ],
+    "time": 14035
+  }
+}

@@ -1,0 +1,160 @@
+{
+  "baseline": {
+    "success": false,
+    "reason": "Baseline attempted tool call",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "EADDRINUSE :::8080\n",
+          "duration_ms": 148
+        }
+      }
+    ],
+    "stats": {
+      "geminiLatency": 7461,
+      "toolLatency": 0,
+      "iterations": 1,
+      "rate_limit_wait_ms": 5158
+    },
+    "tokens": {
+      "prompt": 386,
+      "completion": 46,
+      "total": 530
+    },
+    "calls": {
+      "total": 0,
+      "valid": 0,
+      "successful": 0,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [],
+    "time": 7610
+  },
+  "agent": {
+    "success": false,
+    "reason": "API Error",
+    "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+    "trajectory": [
+      {
+        "event_type": "initial_verifier",
+        "result": {
+          "exit_code": 1,
+          "stdout": "App started on 8080\n",
+          "stderr": "EADDRINUSE :::8080\n",
+          "duration_ms": 141
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "ls -la"
+        },
+        "latency": 12923,
+        "iteration": 1
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "total 16\ndrwxr-xr-x    2 root     root          4096 Aug 29 07:02 .\ndrwxr-xr-x    1 root     root          4096 Aug 29 07:02 ..\n-rw-r--r--    1 root     root            64 Aug 29 07:02 bg.js\n-rw-r--r--    1 root     root           221 Aug 29 07:02 index.js\n",
+          "stderr": "",
+          "duration_ms": 116
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": "index.js"
+        },
+        "latency": 21240,
+        "iteration": 2
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "const http = require('http'); const port = process.env.PORT || 8080; http.createServer().listen(port).on('error', (e) => { console.error('EADDRINUSE :::'+port); process.exit(1); }); console.log('App started on ' + port);\n",
+          "stderr": "",
+          "duration_ms": 134
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "read_file",
+        "args": {
+          "filepath": "bg.js"
+        },
+        "latency": 15430,
+        "iteration": 3
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "read_file",
+        "result": {
+          "exit_code": 0,
+          "stdout": "const http = require('http'); http.createServer().listen(8080);\n",
+          "stderr": "",
+          "duration_ms": 165
+        }
+      },
+      {
+        "event_type": "tool_call",
+        "tool": "execute_command",
+        "args": {
+          "command": "ps aux"
+        },
+        "latency": 14651,
+        "iteration": 4
+      },
+      {
+        "event_type": "tool_result",
+        "tool": "execute_command",
+        "result": {
+          "exit_code": 0,
+          "stdout": "PID   USER     TIME  COMMAND\n    1 root      0:00 sleep 3600\n   20 root      0:00 node bg.js\n   69 root      0:00 ps aux\n",
+          "stderr": "",
+          "duration_ms": 128
+        }
+      },
+      {
+        "event_type": "gemini_error",
+        "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later.",
+        "attempt": 1
+      },
+      {
+        "event_type": "gemini_error",
+        "error": "[GoogleGenerativeAI Error]: Error fetching from https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent: [503 Service Unavailable] This model is currently experiencing high demand. Spikes in demand are usually temporary. Please try again later."
+      }
+    ],
+    "stats": {
+      "geminiLatency": 64244,
+      "toolLatency": 543,
+      "iterations": 5,
+      "rate_limit_wait_ms": 31488
+    },
+    "tokens": {
+      "prompt": 2716,
+      "completion": 174,
+      "total": 3022
+    },
+    "calls": {
+      "total": 4,
+      "valid": 4,
+      "successful": 4,
+      "malformed": 0
+    },
+    "safety_events": [],
+    "failures": [
+      "AGENT_FAILURE"
+    ],
+    "time": 95180
+  }
+}
