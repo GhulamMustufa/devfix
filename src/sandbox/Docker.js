@@ -1,6 +1,9 @@
 import { execFile, execSync } from 'child_process';
 import { promisify } from 'util';
 import { randomBytes } from 'crypto';
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
 
 const execFileAsync = promisify(execFile);
 
@@ -30,6 +33,7 @@ class DockerSandbox {
     this.pidsLimit = options.pidsLimit || 100;
     this.workdir = options.workdir || '/app';
     this.defaultTimeout = options.defaultTimeout || 10000;
+    this.hostMountPath = options.hostMountPath || null;
   }
 
   async start() {
@@ -39,6 +43,26 @@ class DockerSandbox {
     } catch (e) {
       // ignore
     }
+
+    let volumeArgs = [];
+    if (this.hostMountPath) {
+      const absPath = path.resolve(this.hostMountPath);
+      const stat = await fs.promises.stat(absPath);
+      if (!stat.isDirectory()) {
+        throw new Error(`Host mount path ${absPath} is not a directory.`);
+      }
+      
+      const realPath = await fs.promises.realpath(absPath);
+      if (realPath === '/') {
+        throw new Error('Cannot mount root directory /');
+      }
+      if (realPath === await fs.promises.realpath(os.homedir())) {
+        throw new Error('Cannot mount user home directory wholesale');
+      }
+
+      volumeArgs = ['-v', `${realPath}:${this.workdir}`];
+    }
+
     const args = [
       'run', '-d',
       '--name', this.name,
@@ -46,6 +70,7 @@ class DockerSandbox {
       `--cpus=${this.cpus}`,
       `--pids-limit=${this.pidsLimit}`,
       '--security-opt=no-new-privileges=true',
+      ...volumeArgs,
       '-w', this.workdir,
       this.image,
       'sleep', '360000'

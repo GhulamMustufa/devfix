@@ -1,0 +1,21 @@
+{
+  "runId": "8294799e",
+  "timestamp": "2026-08-29T11:43:51.009Z",
+  "startTime": 1788003807319,
+  "endTime": 1788003830726,
+  "durationMs": 23407,
+  "iterations": 15,
+  "toolCalls": 20,
+  "validToolCalls": 20,
+  "invalidToolCalls": 0,
+  "providerErrors": 0,
+  "verificationAttempts": 10,
+  "finalStatus": "MAX_ITERATIONS",
+  "finalVerification": null,
+  "tokenUsage": {
+    "prompt_tokens": "[REDACTED]",
+    "completion_tokens": "[REDACTED]",
+    "total_tokens": "[REDACTED]"
+  },
+  "project": "DEMO:DEV-05"
+}

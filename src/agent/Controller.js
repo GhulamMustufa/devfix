@@ -39,6 +39,7 @@ export class AgentController {
     this.SandboxClass = config.SandboxClass || DockerSandbox;
     this.ToolRegistryClass = config.ToolRegistryClass || ToolRegistry;
     this.verifierFn = config.verifierFn || verify;
+    this.onEvent = config.onEvent || (() => {});
 
     this.sandbox = null;
     
@@ -78,17 +79,18 @@ export class AgentController {
     const actionHistory = new Set();
     let consecutiveDuplicates = 0;
 
-    const finalize = async (status, verification = null) => {
+    const finalize = async (status, verifierResult = null) => {
       process.off('SIGINT', this.onCancel);
       process.off('SIGTERM', this.onCancel);
       telemetry.endTime = Date.now();
       telemetry.durationMs = telemetry.endTime - telemetry.startTime;
       telemetry.finalStatus = status;
-      telemetry.finalVerification = verification;
+      telemetry.finalVerification = verifierResult;
       
       if (this.sandbox) {
         await this.sandbox.stop();
       }
+      this.onEvent({ type: 'agent_done', status, telemetry });
       return telemetry;
     };
 
@@ -101,6 +103,7 @@ export class AgentController {
         }
 
         telemetry.iterations++;
+        this.onEvent({ type: 'iteration_start', iteration: telemetry.iterations });
 
         // Context Management: Truncate history if too long, preserving system prompt, initial failure, and recent items
         let currentLength = messages.reduce((acc, m) => acc + (m.content ? m.content.length : 100), 0);
@@ -112,6 +115,7 @@ export class AgentController {
 
         let response;
         try {
+          this.onEvent({ type: 'agent_investigating' });
           response = await this.provider.chat(messages, schemas);
           if (response.usage) {
             telemetry.tokenUsage.prompt_tokens += response.usage.prompt_tokens || 0;
@@ -120,7 +124,7 @@ export class AgentController {
           }
         } catch (err) {
           telemetry.providerErrors++;
-          console.error("Provider Error:", err.message);
+          this.onEvent({ type: 'provider_error', error: err.message });
           return finalize('PROVIDER_ERROR');
         }
 
@@ -138,6 +142,7 @@ export class AgentController {
 
           for (const tc of response.toolCalls) {
             telemetry.toolCalls++;
+            this.onEvent({ type: 'tool_selected', name: tc.name, args: tc.arguments });
             
             // Validate arguments
             let parsedArgs;
@@ -146,6 +151,7 @@ export class AgentController {
               telemetry.validToolCalls++;
             } catch (e) {
               telemetry.invalidToolCalls++;
+              this.onEvent({ type: 'tool_error', name: tc.name, error: 'Malformed arguments' });
               messages.push({
                 role: 'tool',
                 tool_call_id: tc.id,
@@ -162,6 +168,7 @@ export class AgentController {
               if (consecutiveDuplicates >= 2) {
                 return finalize('REPEATED_ACTION');
               }
+              this.onEvent({ type: 'duplicate_action', name: tc.name });
               messages.push({
                 role: 'tool',
                 tool_call_id: tc.id,
@@ -176,6 +183,7 @@ export class AgentController {
 
             // Execute tool
             const toolResult = await registry.executeTool(tc.name, parsedArgs);
+            this.onEvent({ type: 'tool_executed', name: tc.name, success: toolResult.success });
             
             let resultStr = "";
             if (!toolResult.success) {
@@ -214,7 +222,9 @@ export class AgentController {
         // Verification Boundary
         if (didStateChange && verifierConfig) {
           telemetry.verificationAttempts++;
+          this.onEvent({ type: 'verifier_start' });
           const verifierResult = await this.verifierFn(this.sandbox, verifierConfig);
+          this.onEvent({ type: 'verifier_result', success: verifierResult.success, details: verifierResult });
           
           if (verifierResult.success) {
             return finalize('SUCCESS', verifierResult);
