@@ -17,5 +17,10 @@ node_modules/
 # Mac OS
 .DS_Store
 
+# Secrets
+.env
+.env.*
+!.env.example
+
 # Hackathon temporary evaluation sandboxes
 scratch/
