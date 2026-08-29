@@ -86,6 +86,7 @@ export class AgentController {
       telemetry.durationMs = telemetry.endTime - telemetry.startTime;
       telemetry.finalStatus = status;
       telemetry.finalVerification = verifierResult;
+      telemetry.conversation = messages;
       
       if (this.sandbox) {
         await this.sandbox.stop();
@@ -208,7 +209,8 @@ export class AgentController {
             } else if (tc.name === 'execute_command') {
               // Heuristic for state changing commands
               const cmd = parsedArgs.command || "";
-              if (cmd.includes('npm install') || cmd.includes('apt-get') || cmd.includes('yarn add') || cmd.includes('npm rm') || cmd.includes('mv ') || cmd.includes('cp ') || cmd.includes('echo ') || cmd.includes('touch ') || cmd.includes('>')) {
+              const isStateChange = /npm i|npm rm|yarn add|yarn remove|apt-get|apk add|chmod|chown|kill|fuser|pkill|sed -i|dos2unix|mv |cp /.test(cmd);
+              if (isStateChange) {
                 didStateChange = true;
               }
             }
@@ -233,6 +235,8 @@ export class AgentController {
               role: 'user',
               content: `Verification Failed:\n${JSON.stringify(verifierResult, null, 2)}\n\nThe environment is not fully repaired. Keep investigating.`
             });
+            // Clear history because state changed, so reading files or running commands again is valid
+            actionHistory.clear();
           }
         } else if (!response.toolCalls || response.toolCalls.length === 0) {
           // If no tool calls were made and verification didn't succeed or wasn't configured, prompt to continue

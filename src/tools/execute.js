@@ -27,11 +27,11 @@ function createExecuteCommand(sandbox) {
     // Format the response string for the LLM
     let responseStr = "";
     if (result.timeout) {
-      responseStr = `COMMAND_TIMEOUT\\ntimeout_seconds: 10\\nstdout:\\n\${result.stdout}\\nstderr:\\n\${result.stderr}`;
+      responseStr = `COMMAND_TIMEOUT\ntimeout_seconds: 10\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`;
     } else if (result.exit_code === 0) {
-      responseStr = `COMMAND_SUCCEEDED\\nexit_code: 0\\nstdout:\\n\${result.stdout}`;
+      responseStr = `COMMAND_SUCCEEDED\nexit_code: 0\nstdout:\n${result.stdout}`;
     } else {
-      responseStr = `COMMAND_FAILED\\nexit_code: \${result.exit_code}\\nstdout:\\n\${result.stdout}\\nstderr:\\n\${result.stderr}`;
+      responseStr = `COMMAND_FAILED\nexit_code: ${result.exit_code}\nstdout:\n${result.stdout}\nstderr:\n${result.stderr}`;
     }
 
     return {

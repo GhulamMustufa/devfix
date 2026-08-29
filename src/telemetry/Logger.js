@@ -11,8 +11,8 @@ export class TelemetryLogger {
     await fs.promises.mkdir(this.outDir, { recursive: true });
     const runId = randomBytes(4).toString('hex');
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const filename = `\${timestamp}-\${runId}.json`;
-    const filePath = path.join(this.outDir, filename);
+    const fileName = `${timestamp}-${runId}.json`;
+    const filePath = path.join(this.outDir, fileName);
 
     const scrubbed = this.scrub(telemetry);
     
