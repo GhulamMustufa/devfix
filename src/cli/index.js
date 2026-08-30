@@ -275,6 +275,23 @@ program
   });
 
 program
+  .command('benchmark')
+  .description('Run the 10-case Hackathon Benchmark')
+  .option('--case <id>', 'Run a specific case')
+  .action(async (options) => {
+    // Dynamic import to avoid loading all benchmark components if not running benchmark
+    const { BenchmarkRunner } = await import('../benchmark/Runner.js');
+    try {
+      const output = await BenchmarkRunner.evaluate(DEMO_CASES, options.case, createSpinner, stopSpinner);
+      console.log('\n' + output);
+    } catch (e) {
+      console.error(chalk.red(`✗ Benchmark failed: ${e.message}`));
+      process.exit(1);
+    }
+  });
+
+
+program
   .command('doctor')
   .description('Check system requirements')
   .action(() => {

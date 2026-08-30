@@ -28,3 +28,5 @@ scratch/
 # Telemetry artifacts
 artifacts/runs/*
 !artifacts/runs/.gitkeep
+artifacts/benchmark/*
+!artifacts/benchmark/.gitkeep
