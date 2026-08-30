@@ -94,3 +94,97 @@ test('Telemetry Logger', async (t) => {
     assert.strictEqual(scrubbed.oauth_token, '[REDACTED]');
   });
 });
+
+import TrajectoryGenerator from '../src/telemetry/Trajectory.js';
+
+test('Trajectory Generator', async (t) => {
+  await t.test('successful trajectory', () => {
+    const md = TrajectoryGenerator.generateMarkdown({
+      project: 'DEV-TEST',
+      provider: 'TestProvider',
+      model: 'TestModel',
+      finalStatus: 'SUCCESS',
+      durationMs: 1500,
+      iterations: 1,
+      toolCalls: 1,
+      conversation: [
+        { role: 'system', content: 'system' },
+        { role: 'user', content: 'Context: ...\nInitial Failure:\nnpm start failed' },
+        { role: 'assistant', content: 'OBSERVE this', tool_calls: [{ function: { name: 'execute_command', arguments: '{"command": "ls"}' } }] },
+        { role: 'tool', content: 'file.js' }
+      ]
+    });
+    assert(md.includes('Case: DEV-TEST'));
+    assert(md.includes('Model: TestProvider TestModel'));
+    assert(md.includes('Result: SUCCESS'));
+    assert(md.includes('Duration: 1.5s'));
+    assert(md.includes('Iterations: 1'));
+    assert(md.includes('Tool Calls: 1'));
+    assert(md.includes('npm start failed'));
+    assert(md.includes('OBSERVE this'));
+    assert(md.includes('execute_command'));
+    assert(md.includes('file.js'));
+    assert(md.includes('VERIFIED REPAIR'));
+  });
+
+  await t.test('failed trajectory', () => {
+    const md = TrajectoryGenerator.generateMarkdown({
+      finalStatus: 'MAX_ITERATIONS',
+      conversation: []
+    });
+    assert(md.includes('Result: MAX_ITERATIONS'));
+    assert(md.includes('REPAIR UNSUCCESSFUL'));
+    assert(md.includes('Reason: MAX_ITERATIONS'));
+  });
+
+  await t.test('malformed tool call (ERROR)', () => {
+    const md = TrajectoryGenerator.generateMarkdown({
+      conversation: [
+        { role: 'assistant', content: 'bad tool', tool_calls: [{ function: { name: 'bad_tool', arguments: 'invalid json' } }] },
+        { role: 'tool', content: 'Malformed tool call arguments: Unexpected token' }
+      ]
+    });
+    assert(md.includes('invalid json'));
+    assert(md.includes('Malformed tool call arguments: Unexpected token'));
+  });
+
+  await t.test('verifier failure', () => {
+    const md = TrajectoryGenerator.generateMarkdown({
+      conversation: [
+        { role: 'assistant', content: 'Done' },
+        { role: 'user', content: 'Verification Failed:\n{\n  "success": false\n}\n\nThe environment is not fully repaired. Keep investigating.' }
+      ]
+    });
+    assert(md.includes('## Iteration 1 — VERIFY'));
+    assert(md.includes('Result:\nFAIL'));
+    assert(md.includes('"success": false'));
+  });
+
+  await t.test('secret redaction (proves it uses sanitized input)', () => {
+    // Note: TrajectoryGenerator doesn't scrub, it relies on Logger.scrub. 
+    // This test ensures it renders whatever is passed to it correctly.
+    const logger = new TelemetryLogger();
+    const raw = { conversation: [{ role: 'tool', content: 'Bearer secret_token' }] };
+    const scrubbed = logger.scrub(raw);
+    const md = TrajectoryGenerator.generateMarkdown(scrubbed);
+    assert(md.includes('Bearer [REDACTED]'));
+    assert(!md.includes('secret_token'));
+  });
+
+  await t.test('truncated output', () => {
+    let largeOutput = '';
+    for (let i = 0; i < 60; i++) largeOutput += `line ${i}\n`; // > 50 lines
+    const md = TrajectoryGenerator.generateMarkdown({
+      conversation: [{ role: 'tool', content: largeOutput }]
+    });
+    assert(md.includes('... [truncated]'));
+    assert(!md.includes('line 59'));
+  });
+
+  await t.test('missing optional telemetry fields', () => {
+    const md = TrajectoryGenerator.generateMarkdown({});
+    assert(md.includes('Case: Unknown'));
+    assert(md.includes('Model: Unknown'));
+    assert(md.includes('Result: UNKNOWN'));
+  });
+});

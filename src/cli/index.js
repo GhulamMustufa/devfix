@@ -62,7 +62,7 @@ process.on('SIGINT', () => {
 });
 
 // Run Agent
-async function runAgent(sandbox, verifierConfig, spinner) {
+async function runAgent(sandbox, verifierConfig, spinner, initialFailure, projectContext) {
   const controller = new AgentController({
     maxIterations: 15,
     SandboxClass: class extends DockerSandbox {
@@ -113,6 +113,8 @@ async function runAgent(sandbox, verifierConfig, spinner) {
   // So our dummy class wrapper works perfectly!
 
   const result = await controller.run({
+    initialFailure,
+    projectContext,
     sandboxName: sandbox.name,
     verifierConfig
   });
@@ -194,7 +196,7 @@ program
 
     let result;
     try {
-      result = await runAgent(sandbox, verifierConfig, agentSpinner);
+      result = await runAgent(sandbox, verifierConfig, agentSpinner, "Environment repair requested via fix command", "Analyze the directory and identify what needs to be fixed to satisfy the verifier.");
       stopSpinner(agentSpinner, result.finalStatus === 'SUCCESS', result.finalStatus === 'SUCCESS' ? 'Agent completed repair' : 'Agent finished with failure');
     } catch (e) {
       stopSpinner(agentSpinner, false, 'Agent crashed');
@@ -207,8 +209,9 @@ program
 
     if (result) {
       result.project = absPath;
-      await logger.save(result);
+      const savedPaths = await logger.save(result);
       displayTelemetry(result);
+      console.log(`\nTrajectory: ${savedPaths.md}\n`);
       process.exit(result.finalStatus === 'SUCCESS' ? 0 : 1);
     } else {
       process.exit(5);
@@ -249,7 +252,7 @@ program
     const agentSpinner = createSpinner('Agent investigating...');
     let result;
     try {
-      result = await runAgent(sandbox, demoCase.verifierConfig, agentSpinner);
+      result = await runAgent(sandbox, demoCase.verifierConfig, agentSpinner, demoCase.initialFailure, demoCase.projectContext);
       stopSpinner(agentSpinner, result.finalStatus === 'SUCCESS', result.finalStatus === 'SUCCESS' ? 'Agent completed repair' : 'Agent finished with failure');
     } catch (e) {
       stopSpinner(agentSpinner, false, 'Agent crashed');
@@ -262,8 +265,9 @@ program
 
     if (result) {
       result.project = `DEMO:${caseId}`;
-      await logger.save(result);
+      const savedPaths = await logger.save(result);
       displayTelemetry(result);
+      console.log(`\nTrajectory: ${savedPaths.md}\n`);
       process.exit(result.finalStatus === 'SUCCESS' ? 0 : 1);
     } else {
       process.exit(5);

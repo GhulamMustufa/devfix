@@ -57,6 +57,9 @@ export class AgentController {
     const schemas = registry.getSchemas();
 
     let telemetry = {
+      project: projectContext && projectContext.length > 50 ? projectContext.substring(0, 50) + '...' : projectContext,
+      provider: this.provider.providerType,
+      model: this.provider.modelName,
       startTime: Date.now(),
       endTime: null,
       durationMs: 0,
