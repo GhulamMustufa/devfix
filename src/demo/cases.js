@@ -71,5 +71,82 @@ export const DEMO_CASES = {
       expectedExitCode: 0,
       timeoutMs: 15000
     }
+  },
+  "DEV-06": {
+    name: "DEV-06 — Dependency / Package Configuration Failure",
+    setup: [
+      `echo '{"name": "app", "version": "1.0.0", "dependencies": {"express": "^4.18.0"}}' > package.json`,
+      `echo "const express = require('express'); const cors = require('cors'); const app = express(); app.use(cors()); app.listen(3000);" > index.js`,
+      `npm install`
+    ],
+    initialFailure: "node index.js failed: Error: Cannot find module 'cors'",
+    verifierConfig: {
+      type: 'process',
+      command: 'node index.js',
+      expectedExitCode: 0,
+      timeoutMs: 5000
+    }
+  },
+  "DEV-07": {
+    name: "DEV-07 — Environment / Runtime Configuration Failure",
+    setup: [
+      `echo '{"name": "app", "dependencies": {"dotenv": "^16.0.0"}}' > package.json`,
+      `echo "require('dotenv').config(); if (!process.env.API_KEY) { console.error('Error: API_KEY is missing'); process.exit(1); } console.log('Started');" > index.js`,
+      `echo "API_KEY=test_key_123" > .env.test`,
+      `npm install`
+    ],
+    initialFailure: "node index.js failed: Error: API_KEY is missing",
+    verifierConfig: {
+      type: 'process',
+      command: 'node index.js',
+      expectedExitCode: 0,
+      timeoutMs: 5000
+    }
+  },
+  "DEV-08": {
+    name: "DEV-08 — File / Module Integration Failure",
+    setup: [
+      `mkdir utils`,
+      `echo "module.exports = { Add: (a, b) => a + b };" > utils/math.js`,
+      `echo "const { add } = require('./utils/math'); if (typeof add !== 'function') { throw new TypeError('add is not a function'); } console.log(add(1, 2));" > index.js`
+    ],
+    initialFailure: "node index.js failed: TypeError: add is not a function",
+    verifierConfig: {
+      type: 'process',
+      command: 'node index.js',
+      expectedExitCode: 0,
+      timeoutMs: 5000
+    }
+  },
+  "DEV-09": {
+    name: "DEV-09 — Build / Configuration Failure",
+    setup: [
+      `echo '{"name": "app", "scripts": {"build": "webpack"}}' > package.json`,
+      `npm install webpack webpack-cli --save-dev`,
+      `echo "module.exports = { entry: './src/app.js', mode: 'development' };" > webpack.config.js`,
+      `mkdir src`,
+      `echo "console.log('hello');" > src/index.js`
+    ],
+    initialFailure: "npm run build failed: Module not found: Error: Can't resolve './src/app.js'",
+    verifierConfig: {
+      type: 'process',
+      command: 'npm run build',
+      expectedExitCode: 0,
+      timeoutMs: 15000
+    }
+  },
+  "DEV-10": {
+    name: "DEV-10 — Multi-Step Cascading Failure",
+    setup: [
+      `echo '{"name": "app", "scripts": {"start": "node server.js"}}' > package.json`,
+      `echo "const express = require('express'); const fs = require('fs'); const app = express(); app.get('/', (req, res) => { res.send('ok'); } const config = JSON.parse(fs.readFileSync('config.json', 'utf8')); app.listen(config.port);" > server.js`
+    ],
+    initialFailure: "npm start failed: SyntaxError: Unexpected token 'const'",
+    verifierConfig: {
+      type: 'process',
+      command: 'npm start',
+      expectedExitCode: 0,
+      timeoutMs: 15000
+    }
   }
 };
