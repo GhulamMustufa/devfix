@@ -24,3 +24,7 @@ node_modules/
 
 # Hackathon temporary evaluation sandboxes
 scratch/
+
+# Telemetry artifacts
+artifacts/runs/*
+!artifacts/runs/.gitkeep
