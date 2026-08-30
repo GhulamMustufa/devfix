@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { randomBytes } from 'crypto';
-
+import TrajectoryGenerator from './Trajectory.js';
 export class TelemetryLogger {
   constructor(options = {}) {
     this.outDir = options.outDir || path.resolve(process.cwd(), 'artifacts/runs');
@@ -24,7 +24,13 @@ export class TelemetryLogger {
     };
 
     await fs.promises.writeFile(filePath, JSON.stringify(finalRecord, null, 2), 'utf-8');
-    return filePath;
+
+    // Generate and save markdown trajectory
+    const mdContent = TrajectoryGenerator.generateMarkdown(finalRecord);
+    const mdFilePath = path.join(this.outDir, `${timestamp}-${runId}.md`);
+    await fs.promises.writeFile(mdFilePath, mdContent, 'utf-8');
+
+    return { json: filePath, md: mdFilePath };
   }
 
   scrub(obj) {
