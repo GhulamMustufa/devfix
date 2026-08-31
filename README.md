@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="docs/public/ascii-banner.png" alt="DevFix Terminal Banner" width="400" />
+</div>
+
 # DevFix 🛠️
 
 **The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
