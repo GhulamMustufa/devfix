@@ -24,6 +24,11 @@ features:
 
 ## The "It Works on My Machine" Solver
 
+<div style="display: flex; gap: 1rem; margin-top: 2rem; margin-bottom: 2rem; justify-content: center;">
+  <img src="/demo-06.gif" alt="DevFix installing missing dependencies automatically" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 48%;" />
+  <img src="/demo-08.gif" alt="DevFix fixing code typos automatically" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 48%;" />
+</div>
+
 DevFix is an AI-powered CLI tool designed to solve the headache of broken local environments. 
 
 When a project refuses to build, dependencies conflict, or native binaries are missing, you shouldn't have to spend hours Googling cryptic stack traces. You simply run `devfix inspect .`, and the agent will:
