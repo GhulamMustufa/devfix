@@ -19,6 +19,7 @@ export default defineConfig({
           { text: 'CLI Reference', link: '/cli-reference' },
           { text: 'Benchmarks', link: '/benchmarks' },
           { text: 'Improvement Changelog', link: '/changelog' },
+          { text: 'Reproduction Guide', link: '/reproduction' },
           { text: 'Roadmap & Future Scope', link: '/roadmap' },
           { text: 'Contributing (PRs Welcome)', link: '/contributing' }
         ]

@@ -12,7 +12,9 @@
   <p><i>DevFix autonomously resolving missing configurations and code typos.</i></p>
 </div>
 
-The biggest problem with current AI coding assistants (like Copilot or Cursor) is that they operate entirely on text generation. They give you code and confidently say "I fixed it!", leaving *you* to run the commands, test the environment, and verify if it actually worked.
+## 🚨 The Problem & Bottleneck
+**Who has this problem?** Every software developer, DevOps engineer, and open-source contributor.
+**What is the bottleneck?** The dreaded *"It works on my machine"* syndrome. When a developer clones a repository and the build fails (due to missing global binaries, silent Node version mismatches, or conflicting lockfiles), they spend hours Googling cryptic stack traces. Existing AI assistants (like Copilot) fail here because they simply guess the fix via text generation, leaving the human to manually test if the guess actually compiled.
 
 **DevFix changes that.** 
 
@@ -69,6 +71,14 @@ DevFix was originally born as a highly successful hackathon project, achieving a
 - [ ] **VS Code Extension:** Seamlessly trigger DevFix directly from your editor when a terminal command fails.
 - [ ] **Cloud Sandboxing:** Run fixes on remote infrastructure instead of local Docker.
 - [ ] **Custom Verifiers:** Allow users to define their own success criteria (e.g., `devfix fix --verify "curl localhost:3000"`).
+
+## 🧠 Hackathon Insights & Hot Take
+DevFix was heavily refined during the micro1 Agentic Workflows Hackathon. During our experiments, we observed a massive failure mode: LLMs fundamentally fail at debugging environments when they rely entirely on text generation and assumed context. 
+
+**Our Hot Take:** Giving an AI a massive 1 Million token context window is practically useless for debugging local dependencies. The LLM doesn't need more context—it needs **a bash shell to verify its own assumptions**. Verification is infinitely more important than generation. 
+
+*To see our full journey, read our [Improvement Changelog](https://devfix.ghulam-mustafa.com/changelog).*
+*Judges: Please see our **[Reproduction Guide](https://devfix.ghulam-mustafa.com/reproduction)** to easily reproduce our benchmark results.*
 
 ## 🤝 Contributing (Awaiting PRs!)
 
