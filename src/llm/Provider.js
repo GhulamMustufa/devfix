@@ -1,7 +1,7 @@
 import OpenAI from 'openai';
 
-const MAX_RETRIES = 3;
-const RETRY_DELAY_MS = 1000;
+const MAX_RETRIES = 6;
+const RETRY_DELAY_MS = 2000;
 
 export class LLMProvider {
   constructor(config = {}) {
