@@ -16,6 +16,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/' },
           { text: 'Quick Start', link: '/quickstart' },
+          { text: 'CLI Reference', link: '/cli-reference' },
           { text: 'Benchmarks', link: '/benchmarks' },
           { text: 'Improvement Changelog', link: '/changelog' },
           { text: 'Roadmap & Future Scope', link: '/roadmap' },
