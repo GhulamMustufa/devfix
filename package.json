@@ -1,4 +1,33 @@
 {
+  "name": "devfix",
+  "version": "1.0.0",
+  "description": "An autonomous AI agent for recovering broken developer environments.",
+  "type": "module",
+  "bin": {
+    "devfix": "./bin/devfix"
+  },
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "keywords": [
+    "ai",
+    "agent",
+    "llm",
+    "developer-tools",
+    "hackathon",
+    "devfix",
+    "auto-fix"
+  ],
+  "author": "Ghulam Mustafa",
+  "license": "MIT",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "chalk": "^5.6.2",
@@ -7,6 +36,7 @@
     "openai": "^6.49.0",
     "ora": "^9.4.1"
   },
-  "type": "module",
-  "version": "1.0.0"
+  "devDependencies": {
+    "vitepress": "^1.6.4"
+  }
 }
