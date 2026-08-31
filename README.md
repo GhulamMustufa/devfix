@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="docs/public/ascii-banner.png" alt="DevFix Terminal Banner" width="400" />
+  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/ascii-banner.png" alt="DevFix Terminal Banner" width="400" />
 </div>
 
 # DevFix 🛠️
@@ -7,8 +7,8 @@
 **The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
 
 <div align="center">
-  <img src="docs/public/demo-02.gif" alt="DevFix diagnosing missing environment variables" width="48%" style="border-radius: 8px;" />
-  <img src="docs/public/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" width="48%" style="border-radius: 8px;" />
+  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-02.gif" alt="DevFix diagnosing missing environment variables" width="48%" style="border-radius: 8px;" />
+  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" width="48%" style="border-radius: 8px;" />
   <p><i>DevFix autonomously resolving missing configurations and code typos.</i></p>
 </div>
 
