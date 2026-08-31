@@ -4,6 +4,7 @@ export default defineConfig({
   title: "DevFix",
   description: "An autonomous AI agent for recovering broken developer environments.",
   themeConfig: {
+    logo: '/logo.svg',
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quick Start', link: '/quickstart' },
