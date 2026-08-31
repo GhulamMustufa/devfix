@@ -15,8 +15,8 @@ To run DevFix and reproduce our benchmark results, your host machine must meet t
 Clone the repository and install dependencies from a clean state:
 
 ```bash
-git clone https://github.com/GhulamMustufa/micro1-agentic-workflows.git
-cd micro1-agentic-workflows
+git clone https://github.com/GhulamMustufa/devfix.git
+cd devfix
 npm install
 ```
 

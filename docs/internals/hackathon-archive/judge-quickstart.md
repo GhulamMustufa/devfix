@@ -11,8 +11,8 @@ This guide is designed to get you from zero to a live, verifiable DevFix autonom
 Clone the repository and install dependencies:
 
 ```bash
-git clone https://github.com/GhulamMustufa/micro1-agentic-workflows.git
-cd micro1-agentic-workflows
+git clone https://github.com/GhulamMustufa/devfix.git
+cd devfix
 npm install
 ```
 
