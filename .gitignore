@@ -31,3 +31,7 @@ artifacts/runs/*
 artifacts/benchmark/*
 !artifacts/benchmark/.gitkeep
 *.mov
+
+# VitePress
+docs/.vitepress/cache/
+docs/.vitepress/dist/
