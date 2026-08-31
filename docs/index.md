@@ -25,8 +25,14 @@ features:
 ## The "It Works on My Machine" Solver
 
 <div style="display: flex; gap: 1rem; margin-top: 2rem; margin-bottom: 2rem; justify-content: center;">
-  <img src="/demo-06.gif" alt="DevFix installing missing dependencies automatically" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 48%;" />
-  <img src="/demo-08.gif" alt="DevFix fixing code typos automatically" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 48%;" />
+  <div style="width: 48%; display: flex; flex-direction: column; align-items: center;">
+    <img src="/demo-02.gif" alt="DevFix resolving missing environment configurations" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 100%;" />
+    <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">Case DEV-02: Diagnosing missing environment variables and creating .env configuration</p>
+  </div>
+  <div style="width: 48%; display: flex; flex-direction: column; align-items: center;">
+    <img src="/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); width: 100%;" />
+    <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">Case DEV-08: Automatically detecting and fixing a Javascript export typo</p>
+  </div>
 </div>
 
 DevFix is an AI-powered CLI tool designed to solve the headache of broken local environments. 
