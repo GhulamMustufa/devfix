@@ -26,7 +26,7 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/ghulam-mustafa/devfix' }
+      { icon: 'github', link: 'https://github.com/GhulamMustufa/devfix' }
     ],
     footer: {
       message: 'Released under the MIT License.',

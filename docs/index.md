@@ -11,7 +11,7 @@ hero:
       link: /quickstart
     - theme: alt
       text: View on GitHub
-      link: https://github.com/ghulam-mustafa/devfix
+      link: https://github.com/GhulamMustufa/devfix
 
 features:
   - title: Self-Verifying Fixes
