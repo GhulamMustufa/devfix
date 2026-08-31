@@ -1,6 +1,6 @@
 {
   "name": "devfix",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "An autonomous AI agent for recovering broken developer environments.",
   "type": "module",
   "bin": {
