@@ -7,8 +7,8 @@ DevFix ships with an integrated benchmark suite to evaluate the agent's ability 
 Below is a snapshot of the DevFix agent successfully diagnosing and repairing a local environment without any human intervention. The system provides a detailed report on iterations, time, tool reliability, and token usage.
 
 <div style="margin-top: 2rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
-  <img src="/benchmark.png" alt="DevFix Terminal Benchmark Output" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%; border: 1px solid var(--vp-c-divider);" />
-  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">An automated run of the DevFix benchmark showing a 100% verified recovery rate on the DEV-02 case.</p>
+  <img src="/benchmark-full.png" alt="DevFix Full Benchmark Suite Results" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 100%; border: 1px solid var(--vp-c-divider);" />
+  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">An automated run of the complete 10-case DevFix benchmark suite, demonstrating a 70% verified recovery rate across highly diverse configurations.</p>
 </div>
 
 > [!NOTE]

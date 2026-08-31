@@ -37,6 +37,11 @@ features:
 
 DevFix is an AI-powered CLI tool designed to solve the headache of broken local environments. 
 
+<div style="margin-top: 2rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
+  <img src="/inspect-command.png" alt="DevFix Inspect Command Output" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 70%; border: 1px solid var(--vp-c-divider);" />
+  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">The <code>devfix inspect .</code> command instantly analyzing a broken project's runtime, package manager, and sandbox requirements.</p>
+</div>
+
 When a project refuses to build, dependencies conflict, or native binaries are missing, you shouldn't have to spend hours Googling cryptic stack traces. You simply run `devfix inspect .`, and the agent will:
 
 1. **Observe:** Inspect configurations, package managers, and runtimes without executing code.
