@@ -22,8 +22,27 @@ export class LLMProvider {
       this.client = new OpenAI({
         apiKey: this.apiKey,
       });
+    } else if (this.providerType === 'groq') {
+      this.client = new OpenAI({
+        baseURL: 'https://api.groq.com/openai/v1',
+        apiKey: this.apiKey,
+      });
+    } else if (this.providerType === 'openrouter') {
+      this.client = new OpenAI({
+        baseURL: 'https://openrouter.ai/api/v1',
+        apiKey: this.apiKey,
+      });
+    } else if (this.providerType === 'custom') {
+      const customBaseUrl = config.LLM_BASE_URL || process.env.LLM_BASE_URL;
+      if (!customBaseUrl) {
+        throw new Error("LLM_BASE_URL is required when using the 'custom' provider type.");
+      }
+      this.client = new OpenAI({
+        baseURL: customBaseUrl,
+        apiKey: this.apiKey,
+      });
     } else {
-      throw new Error(`Unsupported LLM_PROVIDER: ${this.providerType}`);
+      throw new Error(`Unsupported LLM_PROVIDER: ${this.providerType}. Supported providers: deepseek, openai, groq, openrouter, custom.`);
     }
   }
 

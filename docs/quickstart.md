@@ -49,3 +49,28 @@ devfix benchmark
 ```
 
 *(Warning: The benchmark requires Docker to be installed and running on your host machine, and requires a valid API key for your LLM provider).*
+
+## 5. Supported LLM Providers
+
+DevFix uses **DeepSeek** (`deepseek-chat`) by default as it provides the most cost-effective tool-calling capabilities. However, you can use any provider you want!
+
+Set the following environment variables in your `.env` file or export them in your terminal:
+
+```bash
+# Example for OpenAI
+export LLM_PROVIDER="openai"
+export LLM_MODEL="gpt-4o"
+export LLM_API_KEY="sk-..."
+
+# Example for Groq
+export LLM_PROVIDER="groq"
+export LLM_MODEL="llama3-70b-8192"
+export LLM_API_KEY="gsk_..."
+```
+
+**Supported Providers:**
+- `deepseek` (Default)
+- `openai`
+- `groq`
+- `openrouter`
+- `custom` (Use this for local models like Ollama, or LMStudio. You must provide `LLM_BASE_URL`).
