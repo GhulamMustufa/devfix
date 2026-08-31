@@ -6,6 +6,7 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
+      { text: 'Quick Start', link: '/quickstart' },
       { text: 'Changelog', link: '/changelog' }
     ],
     sidebar: [
@@ -13,9 +14,10 @@ export default defineConfig({
         text: 'Documentation',
         items: [
           { text: 'Introduction', link: '/' },
+          { text: 'Quick Start', link: '/quickstart' },
           { text: 'Improvement Changelog', link: '/changelog' },
-          { text: 'Roadmap & Future Scope', link: '/#roadmap-future-scope' },
-          { text: 'Contributing (PRs Welcome)', link: '/#contributing-awaiting-prs' }
+          { text: 'Roadmap & Future Scope', link: '/roadmap' },
+          { text: 'Contributing (PRs Welcome)', link: '/contributing' }
         ]
       }
     ],
