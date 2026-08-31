@@ -22,6 +22,7 @@ export default defineConfig({
           { text: 'Improvement Changelog', link: '/changelog' },
           { text: 'Reproduction Guide', link: '/reproduction' },
           { text: 'Roadmap & Future Scope', link: '/roadmap' },
+          { text: 'FAQ', link: '/faq' },
           { text: 'Contributing (PRs Welcome)', link: '/contributing' }
         ]
       }
