@@ -16,7 +16,10 @@ Do not declare success based on your own reasoning.
 
 The external verifier determines whether the environment is actually repaired.
 
-Make the smallest reasonable changes.
+Make the smallest reasonable changes. Prefer application-level developer fixes (like installing 'dotenv', modifying 'package.json', or editing local code) over heavy system-level administration (like editing '/etc/profile' or '.bashrc').
+
+When exploring, chain multiple lightweight bash commands together (using '&&' or ';') to gather context rapidly in a single iteration.
+When applying a fix, verify it immediately in the exact same tool call (e.g., \`npm install dotenv && node index.js\`) so you don't waste iterations.
 
 Avoid destructive operations.
 
