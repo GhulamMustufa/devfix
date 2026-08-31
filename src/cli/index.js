@@ -18,10 +18,19 @@ const __dirname = path.dirname(__filename);
 const pkgPath = path.resolve(__dirname, '../../package.json');
 const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf-8'));
 
+const banner = chalk.cyan(`
+    ____             ________      
+   / __ \\___ _   __ / ____/ /_  __
+  / / / / _ \\ | / // /_  / / | / /
+ / /_/ /  __/ |/ // __/ / /| |/ / 
+/_____/\\___/|___//_/   /_/ |___/  
+`);
+
 program
   .name('devfix')
   .description('Autonomous Local Development Troubleshooter')
-  .version(pkg.version);
+  .version(pkg.version)
+  .addHelpText('before', banner + '\n');
 
 const logger = new TelemetryLogger();
 
