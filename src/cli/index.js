@@ -217,6 +217,29 @@ program
       process.exit(5);
     }
   });
+program
+  .command('inspect [dir]')
+  .description('Inspect a project directory and detect language/runtime')
+  .action(async (dir) => {
+    const targetDir = dir || '.';
+    const absPath = path.resolve(process.cwd(), targetDir);
+
+    const { ProjectDetector } = await import('../project/Detector.js');
+    const { ProjectFormatter } = await import('../project/Formatter.js');
+
+    const spinner = createSpinner('Inspecting project...');
+    try {
+      const context = await ProjectDetector.inspect(absPath);
+      stopSpinner(spinner, true, 'Inspection complete');
+      
+      const output = ProjectFormatter.formatTerminalOutput(absPath, context);
+      console.log('\n' + output);
+    } catch (e) {
+      stopSpinner(spinner, false, 'Inspection failed');
+      console.error(chalk.red(`✗ Error: ${e.message}`));
+      process.exit(1);
+    }
+  });
 
 program
   .command('demo <case>')
