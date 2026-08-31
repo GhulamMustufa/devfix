@@ -6,7 +6,11 @@
 
 **The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
 
-![DevFix Demo](https://raw.githubusercontent.com/ghulam-mustafa/devfix/main/docs/assets/demo.gif) <!-- Placeholder for a future gif -->
+<div align="center">
+  <img src="docs/public/demo-02.gif" alt="DevFix diagnosing missing environment variables" width="48%" style="border-radius: 8px;" />
+  <img src="docs/public/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" width="48%" style="border-radius: 8px;" />
+  <p><i>DevFix autonomously resolving missing configurations and code typos.</i></p>
+</div>
 
 The biggest problem with current AI coding assistants (like Copilot or Cursor) is that they operate entirely on text generation. They give you code and confidently say "I fixed it!", leaving *you* to run the commands, test the environment, and verify if it actually worked.
 
