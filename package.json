@@ -28,6 +28,14 @@
   ],
   "author": "Ghulam Mustafa",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GhulamMustufa/devfix.git"
+  },
+  "bugs": {
+    "url": "https://github.com/GhulamMustufa/devfix/issues"
+  },
+  "homepage": "https://devfix.ghulam-mustafa.com",
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "chalk": "^5.6.2",

@@ -6,6 +6,9 @@
 
 **The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
 
+📚 **[Read the Official Documentation & Quick Start Guide](https://devfix.ghulam-mustafa.com)**
+
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-02.gif" alt="DevFix diagnosing missing environment variables" width="48%" style="border-radius: 8px;" />
   <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" width="48%" style="border-radius: 8px;" />
