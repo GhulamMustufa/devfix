@@ -3,6 +3,7 @@ import { defineConfig } from 'vitepress'
 export default defineConfig({
   title: "DevFix",
   description: "An autonomous AI agent for recovering broken developer environments.",
+  head: [['link', { rel: 'icon', href: '/logo.png' }]],
   themeConfig: {
     logo: '/logo.png',
     nav: [
