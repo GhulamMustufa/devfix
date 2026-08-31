@@ -22,6 +22,11 @@ features:
     details: Automatically detects and supports Node.js, TypeScript, and Python without complex configuration.
 ---
 
+<div style="margin-top: 4rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
+  <img src="/ascii-banner.png" alt="DevFix Terminal Banner" style="border-radius: 8px; max-width: 100%;" />
+  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">The DevFix command-line interface.</p>
+</div>
+
 ## The "It Works on My Machine" Solver
 
 <div style="display: flex; gap: 1rem; margin-top: 2rem; margin-bottom: 2rem; justify-content: center;">
