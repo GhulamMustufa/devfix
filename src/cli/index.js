@@ -252,7 +252,7 @@ program
 
 program
   .command('demo <case>')
-  .description('Run a benchmark demonstration case (DEV-01 to DEV-05)')
+  .description('Run a benchmark demonstration case (DEV-01 to DEV-10)')
   .action(async (caseId) => {
     const demoCase = DEMO_CASES[caseId];
     if (!demoCase) {
