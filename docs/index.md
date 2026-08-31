@@ -4,35 +4,39 @@ layout: home
 hero:
   name: "DevFix"
   text: "Autonomous Environment Recovery"
-  tagline: Top 1% Hackathon Agent. Automatically detects, diagnoses, and fixes broken local development environments.
+  tagline: The open-source AI agent that detects, diagnoses, and fixes broken local development environments.
   actions:
     - theme: brand
-      text: Get Started
-      link: /changelog
+      text: Quick Start
+      link: /quickstart
     - theme: alt
       text: View on GitHub
       link: https://github.com/ghulam-mustafa/devfix
 
 features:
-  - title: 80% Success Rate
-    details: Achieves top-tier performance on the rigorous 10-case DevFix benchmark.
+  - title: Self-Verifying Fixes
+    details: Doesn't just guess. It actively runs your tests (like npm run build) to mathematically prove the environment is fixed.
   - title: Secure & Sandboxed
-    details: Runs completely inside isolated Docker containers with restricted network access.
+    details: AI shell access is dangerous. DevFix isolates all actions inside a secure Docker container, protecting your laptop.
   - title: Language Agnostic
-    details: Automatically detects and supports Node.js, TypeScript, and Python out of the box.
+    details: Automatically detects and supports Node.js, TypeScript, and Python without complex configuration.
 ---
 
-## What is DevFix?
+## The "It Works on My Machine" Solver
 
-DevFix is an AI-powered CLI agent designed to solve the "it works on my machine" problem. When a local project refuses to build or start, you simply run `devfix inspect .`, and the agent will:
+DevFix is an AI-powered CLI tool designed to solve the headache of broken local environments. 
 
-1. **Observe:** Inspect configurations, package managers, and runtimes using static analysis.
-2. **Execute:** Spin up a secure Docker sandbox and attempt to run the project.
-3. **Diagnose:** Analyze stack traces, missing dependencies, and build failures.
-4. **Fix:** Interactively patch code, install packages, and re-run until the environment is healthy.
+When a project refuses to build, dependencies conflict, or native binaries are missing, you shouldn't have to spend hours Googling cryptic stack traces. You simply run `devfix inspect .`, and the agent will:
 
-## The Benchmark
+1. **Observe:** Inspect configurations, package managers, and runtimes without executing code.
+2. **Execute:** Spin up a secure Docker sandbox and attempt to build the project.
+3. **Diagnose:** Analyze stack traces and missing dependencies deeply.
+4. **Fix:** Interactively patch code, install missing packages, and re-run until the environment is healthy.
 
-DevFix was aggressively optimized against a custom deterministic benchmark of common local failures (e.g. missing `node_modules`, broken `package.json`, malformed `tsconfig.json`, syntax errors, and missing system binaries).
+## Open Source & Evolving
 
-Through careful prompt engineering, robust tool design, and context management, the `deepseek-chat` powered agent recovers 8/10 severely broken environments completely autonomously.
+DevFix started as an experiment to see if LLMs could reliably troubleshoot broken configurations without human intervention. We succeeded in building a framework that achieves high recovery rates on severely broken projects.
+
+Today, DevFix is evolving into a serious, everyday developer tool. 
+
+We are actively designing a VS Code Extension, adding support for Rust and Go, and building custom verifier integrations. **We are looking for contributors!** Check out our Roadmap and jump into our GitHub repository to submit your first Pull Request.

@@ -13,7 +13,9 @@ export default defineConfig({
         text: 'Documentation',
         items: [
           { text: 'Introduction', link: '/' },
-          { text: 'Improvement Changelog', link: '/changelog' }
+          { text: 'Improvement Changelog', link: '/changelog' },
+          { text: 'Roadmap & Future Scope', link: '/#roadmap-future-scope' },
+          { text: 'Contributing (PRs Welcome)', link: '/#contributing-awaiting-prs' }
         ]
       }
     ],

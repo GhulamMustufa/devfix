@@ -1,112 +1,80 @@
 # DevFix 🛠️
 
-> **DevFix is a fully autonomous, deterministic agent for fixing broken local development environments.**
+**The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
 
-The biggest problem with current AI coding assistants (like Copilot or Cursor) is that they operate entirely on **vibes and text generation**. They give you code and confidently say "I fixed it!", leaving *you* to run the commands, test the environment, and verify if it actually worked.
+![DevFix Demo](https://raw.githubusercontent.com/ghulam-mustafa/devfix/main/docs/assets/demo.gif) <!-- Placeholder for a future gif -->
+
+The biggest problem with current AI coding assistants (like Copilot or Cursor) is that they operate entirely on text generation. They give you code and confidently say "I fixed it!", leaving *you* to run the commands, test the environment, and verify if it actually worked.
 
 **DevFix changes that.** 
 
-DevFix is a closed-loop, sandboxed agentic workflow. You give it a broken project, and it spins up a secure Docker environment, investigates the root cause, patches files, runs shell commands, and **verifies its own fixes**. 
+DevFix is a sandboxed agentic workflow. You give it a broken project, and it spins up a secure Docker environment, investigates the root cause, patches files, runs shell commands, and **verifies its own fixes**. 
 
-It does not stop until a deterministic verifier (like `npm run build` or `pytest`) explicitly returns a success code.
+It does not stop until your build scripts actually succeed.
 
-```text
-A Standard LLM says:
-"I think this code fixes it." (Hallucination risk: High)
+## ✨ Why DevFix?
 
-DevFix says:
-"Prove it."
+Most AI tools guess. DevFix proves it. 
 
-        ↓
-Sandbox execution
-        ↓
-Deterministic Verifier 
-        ↓
-Verified Repair 
-```
+1. **Self-Verifying (Deterministic Verifier Layer):** DevFix removes the AI's ability to "hallucinate" a success. It actively runs your test suite (`npm run build`, `pytest`, etc.). Only when the environment proves the fix works does the agent complete its task.
+2. **Highly Secure (Sandboxed Execution):** Giving an AI access to run arbitrary bash commands on your laptop is dangerous. DevFix isolates all actions inside a secure, ephemeral Docker container. It cannot harm your host machine.
+3. **Language Agnostic Detection:** Point DevFix at any directory. It automatically reads your lockfiles, `package.json`, or `requirements.txt` to figure out if you're running Node, Python, or TypeScript without you needing to configure anything.
 
-## 🏆 Why this is a Top 1% Architecture
+## 🚀 Quick Start
 
-Most AI hackathon projects are simple wrappers around an LLM API. DevFix introduces rigorous engineering paradigms to the agentic space:
+### Installation
 
-1. **Deterministic Verifier Layer**: DevFix removes the LLM's ability to self-certify its success. Only when the host environment proves the fix works does the agent complete its task.
-2. **Secure Async Sandbox**: AI running arbitrary commands is dangerous. DevFix isolates all agent actions inside an ephemeral Docker container. It protects the host machine from rogue commands (e.g., `rm -rf /`).
-3. **Agent Controller**: A robust orchestrator that handles maximum iteration limits, duplicate action detection, and malformed tool calls.
-4. **Empirical Benchmarking**: We didn't just build an agent; we built a rigorous evaluation framework (`devfix benchmark`) to prove it works against 10 real-world environment failures.
+DevFix is available globally via NPM:
 
-## 📊 The 10-Case Benchmark (Phase 5)
-
-We rigorously benchmarked DevFix against 10 completely different, real-world development environment failures (e.g., missing native dependencies, circular babel imports, broken configs, missing TypeScript compilation).
-
-**Results:**
-- **Verified Recovery Rate:** 80.0% (8/10 cases fixed fully autonomously)
-- **Tool Reliability:** 100.0%
-- **Average Repair Time:** 31.0 seconds
-- **Test Suite:** 50/50 automated unit tests passing.
-
-*(To reproduce the benchmark, simply run `node bin/devfix benchmark`)*
-
-## 🚀 Key Capabilities
-
-- **Autonomous Diagnosis**: Intelligently investigates root causes without human hand-holding.
-- **Isolated Docker Execution**: Repairs are performed in a secure sandbox, preventing catastrophic host damage.
-- **Telemetry & Security**: Logs are securely scrubbed of API credentials (`Bearer`, `sk-...`), and host shells are protected against injection.
-- **Human-Readable Trajectories**: Generates beautiful markdown reports of the agent's thought process for every run.
-
-## 📦 Installation & Setup
-
-### Requirements
-- Node.js (v20+)
-- Docker CLI & Docker Daemon (running)
-- DeepSeek API Key
-
-### Setup
 ```bash
-git clone https://github.com/GhulamMustufa/micro1-agentic-workflows.git
-cd micro1-agentic-workflows
-npm install
+npm install -g devfix
 ```
 
-### Configuration
-Set up your `.env` file in the root of the project:
+### Usage
+
+**1. Inspect your project**
+Curious what DevFix sees? Run this in your project root. It performs a read-only scan to detect your environment:
 ```bash
-LLM_PROVIDER=deepseek
-LLM_MODEL=deepseek-chat
-LLM_API_KEY=your_deepseek_api_key_here
+devfix inspect .
 ```
-*(Note: Never commit your `.env` file or API keys. Telemetry will automatically scrub them if accidentally logged).*
 
-## 💻 Usage
+**2. Fix your project (Coming Soon)**
+The core fix loop is currently optimized for our internal 10-case benchmark. The global `devfix fix .` command is actively being stabilized for public release.
 
-### 1. Verify your setup
-Check that Docker, Node.js, and your API keys are correctly configured:
+### Run the Benchmark
+If you want to see DevFix in action immediately, you can run our rigorous 10-case failure benchmark locally:
 ```bash
-node bin/devfix doctor
+devfix benchmark
 ```
 
-### 2. Run the Benchmark
-Watch DevFix autonomously repair the 10-case evaluation suite in real-time, calculating metrics along the way.
-```bash
-node bin/devfix benchmark
-```
+## 🗺️ Roadmap & Future Scope
 
-### 3. Run a Specific Demo Case
-```bash
-# Demo a missing native dependency error (Python/node-gyp)
-node bin/devfix demo DEV-04
+DevFix was originally born as a highly successful hackathon project, achieving an 80% autonomous recovery rate on severely broken environments. We are now evolving it into a production-grade developer tool.
 
-# Demo a cascading configuration failure
-node bin/devfix demo DEV-05
-```
+**Current Capabilities:**
+- Full support for Node.js (npm, yarn, pnpm), TypeScript, and Python.
+- Secure Docker sandboxing.
+- Autonomous file patching and shell execution.
 
-### 4. Troubleshoot Your Own Project
-To run DevFix on your own broken project, pass the path and the command that determines success:
-```bash
-node bin/devfix fix . --verify "npm run start"
-```
-*(The `--verify` flag enforces the deterministic verification loop).*
+**Coming Soon (We need your help!):**
+- [ ] Support for **Rust**, **Go**, and **Java**.
+- [ ] **VS Code Extension:** Seamlessly trigger DevFix directly from your editor when a terminal command fails.
+- [ ] **Cloud Sandboxing:** Run fixes on remote infrastructure instead of local Docker.
+- [ ] **Custom Verifiers:** Allow users to define their own success criteria (e.g., `devfix fix --verify "curl localhost:3000"`).
 
-## 🏗 Architecture
+## 🤝 Contributing (Awaiting PRs!)
 
-DevFix is designed around a strict separation of concerns, isolating the LLM reasoning from execution and verification.
-See the full architectural breakdown in [docs/architecture.md](docs/architecture.md) and the evolution of the project in [docs/IMPROVEMENT-CHANGELOG.md](docs/IMPROVEMENT-CHANGELOG.md).
+DevFix is in active, early-stage development, and we are heavily awaiting Pull Requests from the community! 
+
+Whether you want to add support for a new language (like Go or Rust), improve the AI prompts, or help build the upcoming VS Code extension, your contributions are welcome.
+
+1. Fork the repository.
+2. Run `npm install` to install dependencies.
+3. Run `npm run test` to ensure the core engine is stable.
+4. Submit a Pull Request!
+
+Please read our [Documentation](https://devfix.ghulam-mustafa.com) for a deep dive into the architecture and system design.
+
+## 📄 License
+
+MIT License. Copyright © 2024-present Ghulam Mustafa.
