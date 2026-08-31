@@ -15,6 +15,7 @@ export default defineConfig({
         items: [
           { text: 'Introduction', link: '/' },
           { text: 'Quick Start', link: '/quickstart' },
+          { text: 'Benchmarks', link: '/benchmarks' },
           { text: 'Improvement Changelog', link: '/changelog' },
           { text: 'Roadmap & Future Scope', link: '/roadmap' },
           { text: 'Contributing (PRs Welcome)', link: '/contributing' }
