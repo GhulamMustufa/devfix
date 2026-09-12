@@ -1,9 +1,21 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-  title: "DevFix",
-  description: "An autonomous AI agent for recovering broken developer environments.",
-  head: [['link', { rel: 'icon', href: '/logo.png' }]],
+  title: "DevFix | Autonomous AI Agent for Developers",
+  description: "An open-source, autonomous AI agent that detects, diagnoses, and fixes broken local development environments and 'It works on my machine' errors.",
+  sitemap: {
+    hostname: 'https://devfix.ghulam-mustafa.com'
+  },
+  head: [
+    ['link', { rel: 'icon', href: '/logo.png' }],
+    ['meta', { name: 'keywords', content: 'AI agent, developer tools, DevFix, DevOps, autonomous debugging, fix broken environments, LLM coding assistant' }],
+    ['meta', { name: 'author', content: 'Ghulam Mustafa' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'DevFix | Autonomous AI Agent for Developers' }],
+    ['meta', { property: 'og:description', content: 'An open-source, autonomous AI agent that detects, diagnoses, and fixes broken local development environments.' }],
+    ['meta', { property: 'og:url', content: 'https://devfix.ghulam-mustafa.com' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }]
+  ],
   themeConfig: {
     logo: '/logo.png',
     nav: [
