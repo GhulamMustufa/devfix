@@ -14,7 +14,9 @@ export default defineConfig({
     ['meta', { property: 'og:title', content: 'DevFix | Autonomous AI Agent for Developers' }],
     ['meta', { property: 'og:description', content: 'An open-source, autonomous AI agent that detects, diagnoses, and fixes broken local development environments.' }],
     ['meta', { property: 'og:url', content: 'https://devfix.ghulam-mustafa.com' }],
-    ['meta', { name: 'twitter:card', content: 'summary_large_image' }]
+    ['meta', { property: 'og:image', content: 'https://devfix.ghulam-mustafa.com/og-banner.jpg' }],
+    ['meta', { name: 'twitter:card', content: 'summary_large_image' }],
+    ['meta', { name: 'twitter:image', content: 'https://devfix.ghulam-mustafa.com/og-banner.jpg' }]
   ],
   themeConfig: {
     logo: '/logo.png',
