@@ -20,7 +20,9 @@ test('CLI Interface', async (t) => {
 
   await t.test('--version returns version', async () => {
     const { stdout } = await execFileAsync('node', [devfixBin, '--version']);
-    assert(stdout.includes('1.0.0'));
+    const fs = await import('fs/promises');
+    const pkg = JSON.parse(await fs.readFile(path.resolve('package.json'), 'utf8'));
+    assert(stdout.includes(pkg.version));
   });
 
   await t.test('fix command requires --verify', async () => {

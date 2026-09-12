@@ -1,0 +1,5 @@
+# Pre-Commit & CI/CD Safety Rules
+1. **Never push broken code:** This repository uses Husky pre-commit hooks to enforce build and test integrity.
+2. **Do not bypass hooks:** If your `git commit` command fails, **DO NOT** attempt to bypass it using `--no-verify`.
+3. **Handle commit failures gracefully:** If a commit is blocked, read the compile error or test failure output. Fix the code causing the failure locally, then attempt the commit again.
+4. **Mandatory Checks:** The pre-commit hook runs `npm run test` and `npm run docs:build`. You must ensure your changes do not break the CLI tests or the VitePress documentation build.
