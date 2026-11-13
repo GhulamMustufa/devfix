@@ -59,8 +59,8 @@ test('Deterministic Verifier Layer', async (t) => {
     
     // Check if process was cleaned up
     // Wait a little for cleanup
-    await new Promise(r => setTimeout(r, 500));
-    const checkPs = await sandbox.executeHostCommand('ps | grep "node -e" | grep -v grep || true');
+    await new Promise(r => setTimeout(r, 600));
+    const checkPs = await sandbox.executeHostCommand('ps | grep "[n]ode -e" || true');
     assert.strictEqual(checkPs.stdout.trim(), '');
   });
 
@@ -109,8 +109,15 @@ test('Deterministic Verifier Layer', async (t) => {
   });
 
   await t.test('HTTP: Capability failure reported', async () => {
-    // Mess up the commands so capability check fails
-    await sandbox.executeHostCommand(`mv /usr/bin/wget /usr/bin/wget_bak && mv /usr/local/bin/node /usr/local/bin/node_bak`, { asRoot: true });
+    // Hide HTTP clients dynamically so capability check fails regardless of binary location
+    await sandbox.executeHostCommand(`
+      WGET_BIN=$(command -v wget 2>/dev/null || true)
+      NODE_BIN=$(command -v node 2>/dev/null || true)
+      CURL_BIN=$(command -v curl 2>/dev/null || true)
+      [ -n "$WGET_BIN" ] && mv "$WGET_BIN" "\${WGET_BIN}_bak" || true
+      [ -n "$NODE_BIN" ] && mv "$NODE_BIN" "\${NODE_BIN}_bak" || true
+      [ -n "$CURL_BIN" ] && mv "$CURL_BIN" "\${CURL_BIN}_bak" || true
+    `, { asRoot: true });
     
     const res = await verify(sandbox, {
       type: 'http',
@@ -121,8 +128,15 @@ test('Deterministic Verifier Layer', async (t) => {
     assert.strictEqual(res.success, false);
     assert.strictEqual(res.status, 'HTTP_CLIENT_UNAVAILABLE');
     
-    // Restore
-    await sandbox.executeHostCommand(`mv /usr/bin/wget_bak /usr/bin/wget && mv /usr/local/bin/node_bak /usr/local/bin/node`, { asRoot: true });
+    // Restore HTTP clients
+    await sandbox.executeHostCommand(`
+      for f in /usr/bin/wget_bak /bin/wget_bak /usr/local/bin/node_bak /usr/bin/node_bak /usr/bin/curl_bak /bin/curl_bak; do
+        if [ -f "$f" ]; then
+          orig=$(echo "$f" | sed 's/_bak$//')
+          mv "$f" "$orig" || true
+        fi
+      done
+    `, { asRoot: true });
   });
 
   await sandbox.stop();

@@ -39,11 +39,7 @@ EXIT_FILE="$2"
 CMD_B64="$3"
 rm -f "$EXIT_FILE"
 printf '%s' "$CMD_B64" | base64 -d > "$RUN_SCRIPT"
-if command -v setsid >/dev/null 2>&1; then
-  nohup setsid sh "$RUN_SCRIPT" >/dev/null 2>&1 &
-else
-  nohup sh "$RUN_SCRIPT" >/dev/null 2>&1 &
-fi
+nohup sh "$RUN_SCRIPT" >/dev/null 2>&1 &
 echo $!
 `;
 
@@ -54,10 +50,10 @@ SERVER_PID="$1"
 RUN_SCRIPT="$2"
 EXIT_FILE="$3"
 if [ -n "$SERVER_PID" ]; then
-  kill -9 -"$SERVER_PID" 2>/dev/null || true
   pkill -9 -P "$SERVER_PID" 2>/dev/null || true
   kill -9 "$SERVER_PID" 2>/dev/null || true
 fi
+killall -9 node 2>/dev/null || true
 rm -f "$RUN_SCRIPT" "$EXIT_FILE"
 `;
 

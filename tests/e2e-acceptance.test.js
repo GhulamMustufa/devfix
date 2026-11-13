@@ -3,6 +3,7 @@ import assert from 'node:assert';
 import fs from 'fs/promises';
 import path from 'path';
 import os from 'os';
+import { fileURLToPath } from 'url';
 import { execFile } from 'child_process';
 import { promisify } from 'util';
 import { StagingWorkspace } from '../src/workspace/Staging.js';
@@ -10,7 +11,8 @@ import { ProjectDetector } from '../src/project/Detector.js';
 import { verifyProcess } from '../src/verifier/Process.js';
 
 const execFileAsync = promisify(execFile);
-const devfixBin = path.resolve(import.meta.dirname, '../bin/devfix');
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const devfixBin = path.resolve(__dirname, '../bin/devfix');
 
 function createLocalSandbox(cwd) {
   return {
