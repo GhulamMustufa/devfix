@@ -7,9 +7,10 @@ import { randomBytes } from 'crypto';
 import chalk from 'chalk';
 
 export class BenchmarkRunner {
-  static async evaluate(cases, selectedCaseId = null, createSpinner, stopSpinner) {
+  static async evaluate(cases, selectedCaseId = null, createSpinner, stopSpinner, options = {}) {
     const runId = randomBytes(4).toString('hex');
     const results = [];
+    const allowNetwork = Boolean(options.allowNetwork);
     
     const casesToRun = selectedCaseId 
       ? { [selectedCaseId]: cases[selectedCaseId] } 
@@ -24,7 +25,10 @@ export class BenchmarkRunner {
       
       const spinner = createSpinner ? createSpinner(`Initializing sandbox for ${caseId}...`) : null;
       
-      const sandbox = new DockerSandbox({ name: `benchmark-${runId}-${caseId.toLowerCase()}` });
+      const sandbox = new DockerSandbox({
+        name: `benchmark-${runId}-${caseId.toLowerCase()}`,
+        allowNetwork,
+      });
       try {
         await sandbox.start();
         for (const cmd of caseDef.setup) {
@@ -39,6 +43,7 @@ export class BenchmarkRunner {
             async start() { }
             async stop() { }
             async execute(cmd, timeout) { return sandbox.execute(cmd, timeout); }
+            async executeArgs(script, args, timeout) { return sandbox.executeArgs(script, args, timeout); }
           }
         });
         

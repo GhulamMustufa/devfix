@@ -1,101 +1,188 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/ascii-banner.png" alt="DevFix Terminal Banner" width="400" />
+  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/ascii-banner.png" alt="DevFix Terminal Banner" width="450" />
+  <p><strong>The open-source autonomous troubleshooter that diagnoses, patches, and verifies broken local development environments.</strong></p>
+  
+  <p>
+    <a href="https://devfix.ghulam-mustafa.com"><img src="https://img.shields.io/badge/docs-devfix.ghulam--mustafa.com-blue?style=flat-square" alt="Documentation" /></a>
+    <a href="https://github.com/GhulamMustufa/devfix/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" /></a>
+    <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square" alt="Node Version" />
+    <img src="https://img.shields.io/badge/tests-121%20passing-success?style=flat-square" alt="Tests" />
+  </p>
 </div>
 
-# DevFix 🛠️
+---
 
-**The open-source autonomous agent that detects, diagnoses, and fixes broken local development environments.**
+## 🚨 The Problem: "It Works on My Machine"
 
-📚 **[Read the Official Documentation & Quick Start Guide](https://devfix.ghulam-mustafa.com)**
+Every software engineer and open-source contributor knows the frustration: you clone a repository, run the setup commands, and it fails with a cryptic stack trace. Missing environment variables, mismatched Node or Python versions, conflicting lockfiles, or broken build configurations steal hours of productive time.
 
+Existing AI code assistants fail here because they simply **generate text and guess**. They leave you to copy-paste error messages back and forth in an endless loop.
 
-<div align="center">
-  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-02.gif" alt="DevFix diagnosing missing environment variables" width="48%" style="border-radius: 8px;" />
-  <img src="https://raw.githubusercontent.com/GhulamMustufa/devfix/main/docs/public/demo-08.gif" alt="DevFix fixing case-sensitive export typos automatically" width="48%" style="border-radius: 8px;" />
-  <p><i>DevFix autonomously resolving missing configurations and code typos.</i></p>
-</div>
+**DevFix changes that.**
 
-## 🚨 The Problem & Bottleneck
-**Who has this problem?** Every software developer, DevOps engineer, and open-source contributor.
-**What is the bottleneck?** The dreaded *"It works on my machine"* syndrome. When a developer clones a repository and the build fails (due to missing global binaries, silent Node version mismatches, or conflicting lockfiles), they spend hours Googling cryptic stack traces. Existing AI assistants (like Copilot) fail here because they simply guess the fix via text generation, leaving the human to manually test if the guess actually compiled.
+DevFix is an autonomous, sandboxed troubleshooting agent. You point it at a broken project and supply a verification command (`npm test`, `pytest`, `npm run build`). DevFix detects your environment, stages your project safely, launches a hardened Docker container, diagnoses the failure, patches files, and **determines success deterministically using your actual verification commands**.
 
-**DevFix changes that.** 
+---
 
-DevFix is a sandboxed agentic workflow. You give it a broken project, and it spins up a secure Docker environment, investigates the root cause, patches files, runs shell commands, and **verifies its own fixes**. 
+## ✨ Key Capabilities
 
-It does not stop until your build scripts actually succeed.
+1. **Deterministic Verification:** Unlike agents that self-declare completion, DevFix relies on objective criteria (process return codes, HTTP responses, or multi-step check pipelines). It iterates until your environment genuinely passes.
+2. **Non-Destructive Staging Isolation:** DevFix **never** mounts your real project directory as a writable Docker volume. Repairs happen inside a temporary staging copy. You review a unified diff and must explicitly approve changes before write-back.
+3. **Pre-Commit Rollback Protection:** Before touching any file, DevFix saves an immutable rollback snapshot. Reverting any repair is as simple as running `devfix rollback`.
+4. **Hardened Docker Sandboxing:** Containers execute as a non-root user (`--user 1000:1000`), drop all kernel capabilities (`--cap-drop=ALL`), disable network by default (`--network=none`), and enforce strict CPU and memory limits.
+5. **Deep Environment Detection:** Automatically identifies Node.js (npm, pnpm, yarn, bun, Corepack), Python (pip, uv, Poetry, Pipenv, Conda), version constraints (`.nvmrc`, `engines.node`, `pyproject.toml`), and monorepos (`pnpm-workspace.yaml`, `workspaces` arrays).
+6. **Universal Secret Redaction:** Centralized redaction scrubs API keys, bearer tokens, database URLs, and private keys from prompts, logs, and telemetry.
+7. **Multi-Provider LLM Engine:** Supports Google Gemini (`gemini-3.8-flash`), DeepSeek, OpenAI (`gpt-4o`), Groq, and keyless local models via Ollama (`llama3.2`).
 
-## ✨ Why DevFix?
-
-Most AI tools guess. DevFix proves it. 
-
-1. **Self-Verifying (Deterministic Verifier Layer):** DevFix removes the AI's ability to "hallucinate" a success. It actively runs your test suite (`npm run build`, `pytest`, etc.). Only when the environment proves the fix works does the agent complete its task.
-2. **Highly Secure (Sandboxed Execution):** Giving an AI access to run arbitrary bash commands on your laptop is dangerous. DevFix isolates all actions inside a secure, ephemeral Docker container. It cannot harm your host machine.
-3. **Language Agnostic Detection:** Point DevFix at any directory. It automatically reads your lockfiles, `package.json`, or `requirements.txt` to figure out if you're running Node, Python, or TypeScript without you needing to configure anything.
+---
 
 ## 🚀 Quick Start
 
 ### Installation
 
-DevFix is available globally via NPM:
+Install DevFix globally via npm:
 
 ```bash
 npm install -g devfix
 ```
 
-### Usage
+Verify your setup:
 
-**1. Inspect your project**
-Curious what DevFix sees? Run this in your project root. It performs a read-only scan to detect your environment:
+```bash
+devfix doctor
+```
+
+### Configure Your LLM Provider
+
+Add credentials to your `.env` file or export them in your terminal:
+
+```bash
+# Google Gemini (Recommended)
+export LLM_PROVIDER="gemini"
+export GEMINI_API_KEY="AIzaSy..."
+
+# Or DeepSeek
+export LLM_PROVIDER="deepseek"
+export LLM_API_KEY="sk-..."
+
+# Or Free / Local via Ollama (No API key needed!)
+export LLM_PROVIDER="ollama"
+```
+
+---
+
+## 🛠️ CLI Usage & Examples
+
+### 1. Inspect a Project (Read-Only)
+Analyze a project's language, runtime version, package manager, and configuration conflicts without running any code:
+
 ```bash
 devfix inspect .
 ```
 
-**2. Fix your project (Coming Soon)**
-The core fix loop is currently optimized for our internal 10-case benchmark. The global `devfix fix .` command is actively being stabilized for public release.
+To output machine-readable JSON:
 
-### Run the Benchmark
-If you want to see DevFix in action immediately, you can run our rigorous 10-case failure benchmark locally:
 ```bash
-devfix benchmark
+devfix inspect . --json
 ```
 
-## 🗺️ Roadmap & Future Scope
+### 2. Repair a Project (`devfix fix`)
+Point DevFix at any broken project and specify the command that proves it works:
 
-DevFix was originally born as a highly successful hackathon project, achieving an 80% autonomous recovery rate on severely broken environments. We are now evolving it into a production-grade developer tool.
+```bash
+# Basic repair with test verification
+devfix fix ./my-app --verify "npm test"
 
-**Current Capabilities:**
-- Full support for Node.js (npm, yarn, pnpm), TypeScript, and Python.
-- Secure Docker sandboxing.
-- Autonomous file patching and shell execution.
+# Multi-step verification (build must succeed AND tests must pass)
+devfix fix ./my-app --verify "npm run build" --verify "npm test"
 
-**Coming Soon (We need your help!):**
-- [ ] Support for **Rust**, **Go**, and **Java**.
-- [ ] **VS Code Extension:** Seamlessly trigger DevFix directly from your editor when a terminal command fails.
-- [ ] **Cloud Sandboxing:** Run fixes on remote infrastructure instead of local Docker.
-- [ ] **Custom Verifiers:** Allow users to define their own success criteria (e.g., `devfix fix --verify "curl localhost:3000"`).
+# Dry-run mode: diagnose and verify in staging without touching host files
+devfix fix ./my-app --verify "npm test" --dry-run
 
-## 🧠 Hackathon Insights & Hot Take
-DevFix was heavily refined during the micro1 Agentic Workflows Hackathon. During our experiments, we observed a massive failure mode: LLMs fundamentally fail at debugging environments when they rely entirely on text generation and assumed context. 
+# Allow network access for downloading missing packages
+devfix fix ./my-app --verify "npm test" --allow-network
 
-**Our Hot Take:** Giving an AI a massive 1 Million token context window is practically useless for debugging local dependencies. The LLM doesn't need more context—it needs **a bash shell to verify its own assumptions**. Verification is infinitely more important than generation. 
+# Non-interactive approval for CI/CD pipelines
+devfix fix ./my-app --verify "npm test" --yes
 
-*To see our full journey, read our [Improvement Changelog](https://devfix.ghulam-mustafa.com/changelog).*
-*Judges: Please see our **[Reproduction Guide](https://devfix.ghulam-mustafa.com/reproduction)** to easily reproduce our benchmark results.*
+# Specify a custom Docker base image
+devfix fix ./backend --verify "pytest" --image python:3.11-slim
+```
 
-## 🤝 Contributing (Awaiting PRs!)
+### 3. Review Diffs & Repair History
+```bash
+# View recent repairs and rollback availability
+devfix history
 
-DevFix is in active, early-stage development, and we are heavily awaiting Pull Requests from the community! 
+# Inspect file modifications from previous repairs
+devfix diff
+```
 
-Whether you want to add support for a new language (like Go or Rust), improve the AI prompts, or help build the upcoming VS Code extension, your contributions are welcome.
+### 4. Roll Back Changes
+Instantly revert any repair to its exact pre-repair state:
 
-1. Fork the repository.
-2. Run `npm install` to install dependencies.
-3. Run `npm run test` to ensure the core engine is stable.
-4. Submit a Pull Request!
+```bash
+# List available rollback snapshots
+devfix rollback --list
 
-Please read our [Documentation](https://devfix.ghulam-mustafa.com) for a deep dive into the architecture and system design.
+# Revert the latest repair
+devfix rollback
+
+# Revert a specific repair by ID
+devfix rollback devfix-rollback-a1b2c3d4
+```
+
+---
+
+## 🔒 Security Model
+
+DevFix is engineered with defense-in-depth security:
+- **No Direct Host Mounts:** All repairs run in an isolated temporary staging workspace.
+- **Default Network Isolation:** Sandboxes run with `--network=none` by default.
+- **Dropped Capabilities:** Full `--cap-drop=ALL` with `--security-opt=no-new-privileges=true`.
+- **Sensitive File Exclusion:** `.git`, `.env*` (except `.env.example`), private keys, and cloud credentials are excluded from staging and blocked from tools.
+- **Untrusted Data Defense:** All external files and error messages are wrapped in untrusted data prompts to neutralize prompt injection attacks.
+
+For full details, read our [Security Documentation](https://devfix.ghulam-mustafa.com/security).
+
+---
+
+## 📚 Documentation
+
+Comprehensive guides, architecture diagrams, and tutorials are available on our official documentation site:
+
+- 📖 [Official Documentation](https://devfix.ghulam-mustafa.com)
+- 🚀 [Quick Start Guide](https://devfix.ghulam-mustafa.com/quickstart)
+- ⚙️ [CLI Reference](https://devfix.ghulam-mustafa.com/cli-reference)
+- 🏗️ [Architecture Overview](https://devfix.ghulam-mustafa.com/architecture)
+- 🛡️ [Security Model](https://devfix.ghulam-mustafa.com/security)
+- ❓ [Frequently Asked Questions](https://devfix.ghulam-mustafa.com/faq)
+- 📊 [Benchmark Evaluation & Historical Evidence](https://devfix.ghulam-mustafa.com/benchmarks)
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions from the community! Please read [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md) before submitting pull requests.
+
+```bash
+# Clone the repository
+git clone https://github.com/GhulamMustufa/devfix.git
+cd devfix
+
+# Install dependencies
+npm install
+
+# Run test suites
+npm test
+
+# Build documentation
+npm run docs:build
+```
+
+---
 
 ## 📄 License
 
-MIT License. Copyright © 2024-present Ghulam Mustafa.
+DevFix is open-source software released under the [MIT License](LICENSE).  
+Copyright © 2024-present Ghulam Mustafa.

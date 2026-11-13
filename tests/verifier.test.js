@@ -110,7 +110,7 @@ test('Deterministic Verifier Layer', async (t) => {
 
   await t.test('HTTP: Capability failure reported', async () => {
     // Mess up the commands so capability check fails
-    await sandbox.executeHostCommand(`mv /usr/bin/wget /usr/bin/wget_bak && mv /usr/local/bin/node /usr/local/bin/node_bak`);
+    await sandbox.executeHostCommand(`mv /usr/bin/wget /usr/bin/wget_bak && mv /usr/local/bin/node /usr/local/bin/node_bak`, { asRoot: true });
     
     const res = await verify(sandbox, {
       type: 'http',
@@ -122,7 +122,7 @@ test('Deterministic Verifier Layer', async (t) => {
     assert.strictEqual(res.status, 'HTTP_CLIENT_UNAVAILABLE');
     
     // Restore
-    await sandbox.executeHostCommand(`mv /usr/bin/wget_bak /usr/bin/wget && mv /usr/local/bin/node_bak /usr/local/bin/node`);
+    await sandbox.executeHostCommand(`mv /usr/bin/wget_bak /usr/bin/wget && mv /usr/local/bin/node_bak /usr/local/bin/node`, { asRoot: true });
   });
 
   await sandbox.stop();

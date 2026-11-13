@@ -184,4 +184,89 @@ describe('Production Agent Controller', () => {
     assert.strictEqual(result.finalStatus, 'PROVIDER_ERROR');
     assert.strictEqual(result.providerErrors, 1);
   });
+
+  test('Context truncation prunes atomic turns without orphaning tool calls or tool results', async () => {
+    const { pruneMessages, calculateContextLength } = await import('../src/agent/context.js');
+
+    const largeContent = 'X'.repeat(500);
+    const messages = [
+      { role: 'system', content: 'system instruction' },
+      { role: 'user', content: 'initial failure' },
+      // Turn 1: Assistant with 2 tool calls, followed by 2 tool results
+      {
+        role: 'assistant',
+        content: largeContent,
+        tool_calls: [
+          { id: 'call_1', function: { name: 'read_file', arguments: '{}' } },
+          { id: 'call_2', function: { name: 'read_file', arguments: '{}' } },
+        ],
+      },
+      { role: 'tool', tool_call_id: 'call_1', name: 'read_file', content: largeContent },
+      { role: 'tool', tool_call_id: 'call_2', name: 'read_file', content: largeContent },
+      { role: 'user', content: 'Verification Failed:\nTurn 1 failed' },
+      // Turn 2: Assistant with 1 tool call
+      {
+        role: 'assistant',
+        content: largeContent,
+        tool_calls: [
+          { id: 'call_3', function: { name: 'patch_file', arguments: '{}' } },
+        ],
+      },
+      { role: 'tool', tool_call_id: 'call_3', name: 'patch_file', content: largeContent },
+      { role: 'user', content: 'Verification Failed:\nTurn 2 failed' },
+      // Turn 3: Most recent turn
+      {
+        role: 'assistant',
+        content: 'latest plan',
+        tool_calls: [
+          { id: 'call_4', function: { name: 'execute_command', arguments: '{}' } },
+        ],
+      },
+      { role: 'tool', tool_call_id: 'call_4', name: 'execute_command', content: 'ok' },
+    ];
+
+    // Force pruning by specifying maxTotalLength smaller than total
+    const pruned = pruneMessages(messages, 1500, 1);
+
+    // 1. Header (system and initial user) must be intact
+    assert.strictEqual(pruned[0].role, 'system');
+    assert.strictEqual(pruned[1].role, 'user');
+    assert.strictEqual(pruned[1].content, 'initial failure');
+
+    // 2. Notice should be present
+    assert(pruned.some((m) => m.content && m.content.includes('trimmed to conserve context')));
+
+    // 3. Verify protocol integrity: EVERY assistant tool_call has matching tool messages
+    // AND every tool message has a preceding assistant with matching tool_call_id
+    const assistantToolCallIds = new Set();
+    const toolResultIds = new Set();
+
+    for (let i = 0; i < pruned.length; i++) {
+      const msg = pruned[i];
+      if (msg.role === 'assistant' && Array.isArray(msg.tool_calls)) {
+        for (const tc of msg.tool_calls) {
+          assistantToolCallIds.add(tc.id);
+        }
+      } else if (msg.role === 'tool') {
+        assert(
+          assistantToolCallIds.has(msg.tool_call_id),
+          `Orphaned tool message found: ${msg.tool_call_id} has no preceding assistant call`
+        );
+        toolResultIds.add(msg.tool_call_id);
+      }
+    }
+
+    // Every declared tool call must have a corresponding tool result
+    for (const id of assistantToolCallIds) {
+      assert(
+        toolResultIds.has(id),
+        `Orphaned tool call found: ${id} has no matching tool response message`
+      );
+    }
+
+    // Turn 1 should be gone, Turn 3 should still be present
+    assert(!assistantToolCallIds.has('call_1'));
+    assert(!assistantToolCallIds.has('call_2'));
+    assert(assistantToolCallIds.has('call_4'));
+  });
 });

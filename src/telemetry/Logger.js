@@ -2,79 +2,71 @@ import fs from 'fs';
 import path from 'path';
 import { randomBytes } from 'crypto';
 import TrajectoryGenerator from './Trajectory.js';
+import { isSensitiveKey, redactObject, redactString } from '../security/Redactor.js';
+
 export class TelemetryLogger {
   constructor(options = {}) {
-    this.outDir = options.outDir || path.resolve(process.cwd(), 'artifacts/runs');
+    const isExplicitlyDisabled = options.enabled === false;
+    const isEnvDisabled =
+      process.env.DEVFIX_TELEMETRY === '0' ||
+      process.env.DO_NOT_TRACK === '1' ||
+      process.env.DEVFIX_NO_TELEMETRY === '1';
+
+    this.enabled = !isExplicitlyDisabled && !isEnvDisabled;
+    this.outDir =
+      options.outDir ||
+      process.env.DEVFIX_RUNS_DIR ||
+      process.env.DEVFIX_TELEMETRY_DIR ||
+      path.resolve(process.cwd(), 'artifacts/runs');
   }
 
   async save(telemetry) {
-    await fs.promises.mkdir(this.outDir, { recursive: true });
-    const runId = randomBytes(4).toString('hex');
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const fileName = `${timestamp}-${runId}.json`;
-    const filePath = path.join(this.outDir, fileName);
+    if (!this.enabled) {
+      return { disabled: true, json: null, md: null };
+    }
 
-    const scrubbed = this.scrub(telemetry);
-    
-    // Add extra metadata for the run
-    const finalRecord = {
-      runId,
-      timestamp: new Date().toISOString(),
-      ...scrubbed
-    };
+    try {
+      await fs.promises.mkdir(this.outDir, { recursive: true });
+      const runId = randomBytes(4).toString('hex');
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `${timestamp}-${runId}.json`;
+      const filePath = path.join(this.outDir, fileName);
 
-    await fs.promises.writeFile(filePath, JSON.stringify(finalRecord, null, 2), 'utf-8');
+      const scrubbed = this.scrub(telemetry);
 
-    // Generate and save markdown trajectory
-    const mdContent = TrajectoryGenerator.generateMarkdown(finalRecord);
-    const mdFilePath = path.join(this.outDir, `${timestamp}-${runId}.md`);
-    await fs.promises.writeFile(mdFilePath, mdContent, 'utf-8');
+      // Add extra metadata for the run
+      const finalRecord = {
+        runId,
+        timestamp: new Date().toISOString(),
+        ...scrubbed,
+      };
 
-    return { json: filePath, md: mdFilePath };
+      await fs.promises.writeFile(filePath, JSON.stringify(finalRecord, null, 2), 'utf-8');
+
+      // Generate and save markdown trajectory
+      const mdContent = TrajectoryGenerator.generateMarkdown(finalRecord);
+      const mdFilePath = path.join(this.outDir, `${timestamp}-${runId}.md`);
+      await fs.promises.writeFile(mdFilePath, mdContent, 'utf-8');
+
+      return { json: filePath, md: mdFilePath, runId };
+    } catch (err) {
+      // Telemetry failures must never break or crash a repair workflow
+      if (process.env.DEBUG || process.env.DEVFIX_DEBUG) {
+        console.warn(`[devfix telemetry warning] Failed to save telemetry record: ${err.message}`);
+      }
+      return { error: err.message, json: null, md: null };
+    }
   }
 
   scrub(obj) {
-    if (obj === null || obj === undefined) return obj;
-    if (typeof obj === 'string') {
-      return this._scrubString(obj);
-    }
-    if (Array.isArray(obj)) {
-      return obj.map(item => this.scrub(item));
-    }
-    if (typeof obj === 'object') {
-      const scrubbedObj = {};
-      for (const [key, value] of Object.entries(obj)) {
-        if (this._isSensitiveKey(key)) {
-          scrubbedObj[key] = '[REDACTED]';
-        } else {
-          scrubbedObj[key] = this.scrub(value);
-        }
-      }
-      return scrubbedObj;
-    }
-    return obj;
+    return redactObject(obj);
   }
 
   _isSensitiveKey(key) {
-    const lower = key.toLowerCase();
-    if (lower === 'tokenusage' || lower === 'tokens' || lower === 'prompt_tokens' || lower === 'completion_tokens' || lower === 'total_tokens') return false; // Allow token telemetry
-    return lower.includes('api_key') ||
-           lower.includes('secret') ||
-           lower.includes('password') ||
-           (lower.includes('token') && !lower.includes('usage')) ||
-           lower.includes('authorization');
+    return isSensitiveKey(key);
   }
 
   _scrubString(str) {
-    // Scrub common credential patterns
-    let scrubbed = str;
-    
-    // Bearer tokens
-    scrubbed = scrubbed.replace(/Bearer\s+[a-zA-Z0-9\-._~+/]+=*/gi, 'Bearer [REDACTED]');
-    
-    // Generic API keys (sk-..., etc.)
-    scrubbed = scrubbed.replace(/sk-[a-zA-Z0-9\\-]{20,}/g, 'sk-[REDACTED]');
-    
-    return scrubbed;
+    return redactString(str);
   }
 }

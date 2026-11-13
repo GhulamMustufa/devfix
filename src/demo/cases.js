@@ -37,6 +37,7 @@ export const DEMO_CASES = {
     initialFailure: "node index.js failed: EADDRINUSE :::8080",
     verifierConfig: {
       type: 'http',
+      startCommand: 'node index.js',
       command: 'node index.js',
       url: 'http://localhost:8080',
       expectedStatus: 200,

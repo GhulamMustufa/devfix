@@ -1,0 +1,156 @@
+name: DevFix CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'improve/**'
+      - 'feature/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
+
+jobs:
+  audit:
+    name: Security Audit & Hygiene
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Run production dependency vulnerability audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Verify no uncommitted secrets or backup files
+        run: |
+          if git status --porcelain | grep -E '\.(env|bak|tgz)$'; then
+            echo "ERROR: Disallowed sensitive or temporary files detected in workspace"
+            exit 1
+          fi
+
+  unit-tests:
+    name: Unit Tests (Node ${{ matrix.node-version }} on ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [18, 20, 22]
+        os: [ubuntu-latest]
+        include:
+          - os: macos-latest
+            node-version: 20
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Run complete non-Docker test suite
+        run: npm run test:unit
+
+  docker-tests:
+    name: Docker Integration Tests (Live Daemon)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Verify Docker daemon and pull test images
+        run: |
+          docker version
+          docker info
+          docker pull node:18-alpine
+          docker pull node:20-alpine
+
+      - name: Run Docker foundation and verifier test suite
+        run: npm run test:docker
+
+  e2e-acceptance:
+    name: End-to-End Acceptance Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Run end-to-end acceptance tests
+        run: npm run test:e2e
+
+  docs-build:
+    name: Documentation Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Build VitePress documentation
+        run: npm run docs:build
+
+  package-validation:
+    name: NPM Package & Release Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Run release validation script
+        run: npm run validate:release

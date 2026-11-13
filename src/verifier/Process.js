@@ -1,3 +1,5 @@
+import { redactString } from '../security/Redactor.js';
+
 export async function verifyProcess({ sandbox, command, expectedExitCode = 0, timeoutMs = 5000 }) {
   if (!sandbox || !command) {
     return {
@@ -28,8 +30,8 @@ export async function verifyProcess({ sandbox, command, expectedExitCode = 0, ti
     success,
     status,
     exitCode: result.exit_code,
-    stdout: result.stdout,
-    stderr: result.stderr,
+    stdout: redactString(result.stdout || ''),
+    stderr: redactString(result.stderr || ''),
     durationMs: result.duration_ms
   };
 }

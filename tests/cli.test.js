@@ -14,8 +14,17 @@ test('CLI Interface', async (t) => {
     const { stdout } = await execFileAsync('node', [devfixBin, '--help']);
     assert(stdout.includes('Usage: devfix'));
     assert(stdout.includes('fix [options] <project>'));
-    assert(stdout.includes('demo <case>'));
+    assert(stdout.includes('rollback'));
+    assert(stdout.includes('demo [options] <case>'));
     assert(stdout.includes('doctor'));
+  });
+
+  await t.test('fix --help documents Phase 1 and Phase 3 safety & environment flags', async () => {
+    const { stdout } = await execFileAsync('node', [devfixBin, 'fix', '--help']);
+    assert(stdout.includes('--dry-run'));
+    assert(stdout.includes('--yes'));
+    assert(stdout.includes('--allow-network'));
+    assert(stdout.includes('--image <image>'));
   });
 
   await t.test('--version returns version', async () => {
@@ -80,6 +89,12 @@ test('Telemetry Logger', async (t) => {
     const input = { message: 'Failed with key sk-proj-1234567890abcdef1234567890abcdef' };
     const scrubbed = logger.scrub(input);
     assert.strictEqual(scrubbed.message, 'Failed with key sk-[REDACTED]');
+  });
+
+  await t.test('scrubs Gemini API keys', () => {
+    const input = { message: 'Failed with key AIzaSyFakeTestKey1234567890abcdef' };
+    const scrubbed = logger.scrub(input);
+    assert.strictEqual(scrubbed.message, 'Failed with key AIza[REDACTED]');
   });
 
   await t.test('scrubs sensitive object keys entirely', () => {

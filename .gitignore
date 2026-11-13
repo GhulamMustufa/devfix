@@ -35,3 +35,10 @@ artifacts/benchmark/*
 # VitePress
 docs/.vitepress/cache/
 docs/.vitepress/dist/
+
+# Local DevFix cache & snapshots
+.devfix/
+
+# Backup & generated archives
+*.bak
+*.tgz

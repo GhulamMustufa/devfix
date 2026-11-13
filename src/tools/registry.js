@@ -39,12 +39,12 @@ const toolSchemas = [
 ];
 
 class ToolRegistry {
-  constructor(sandbox) {
+  constructor(sandbox, options = {}) {
     this.sandbox = sandbox;
     this.handlers = {
-      execute_command: createExecuteCommand(sandbox),
-      read_file: createReadFile(sandbox),
-      patch_file: createPatchFile(sandbox)
+      execute_command: createExecuteCommand(sandbox, options),
+      read_file: createReadFile(sandbox, options),
+      patch_file: createPatchFile(sandbox, options)
     };
   }
 
