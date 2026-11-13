@@ -109,34 +109,24 @@ test('Deterministic Verifier Layer', async (t) => {
   });
 
   await t.test('HTTP: Capability failure reported', async () => {
-    // Hide HTTP clients dynamically so capability check fails regardless of binary location
-    await sandbox.executeHostCommand(`
-      WGET_BIN=$(command -v wget 2>/dev/null || true)
-      NODE_BIN=$(command -v node 2>/dev/null || true)
-      CURL_BIN=$(command -v curl 2>/dev/null || true)
-      [ -n "$WGET_BIN" ] && mv "$WGET_BIN" "\${WGET_BIN}_bak" || true
-      [ -n "$NODE_BIN" ] && mv "$NODE_BIN" "\${NODE_BIN}_bak" || true
-      [ -n "$CURL_BIN" ] && mv "$CURL_BIN" "\${CURL_BIN}_bak" || true
-    `, { asRoot: true });
-    
-    const res = await verify(sandbox, {
+    // Execute inside sandbox with empty PATH so capability check detects no HTTP client
+    const restrictedSandbox = {
+      executeArgs: (script, args, timeoutMs) => {
+        return sandbox.executeArgs(`PATH="" ${script}`, args, timeoutMs);
+      },
+      execute: (cmd, timeoutMs) => {
+        return sandbox.execute(`PATH="" ${cmd}`, timeoutMs);
+      }
+    };
+
+    const res = await verify(restrictedSandbox, {
       type: 'http',
       url: 'http://127.0.0.1:8084/',
       timeoutMs: 1000
     });
-    
+
     assert.strictEqual(res.success, false);
     assert.strictEqual(res.status, 'HTTP_CLIENT_UNAVAILABLE');
-    
-    // Restore HTTP clients
-    await sandbox.executeHostCommand(`
-      for f in /usr/bin/wget_bak /bin/wget_bak /usr/local/bin/node_bak /usr/bin/node_bak /usr/bin/curl_bak /bin/curl_bak; do
-        if [ -f "$f" ]; then
-          orig=$(echo "$f" | sed 's/_bak$//')
-          mv "$f" "$orig" || true
-        fi
-      done
-    `, { asRoot: true });
   });
 
   await sandbox.stop();

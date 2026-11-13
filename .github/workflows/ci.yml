@@ -70,22 +70,7 @@ jobs:
         run: npm ci
 
       - name: Run complete non-Docker test suite
-        id: unit_step
-        run: |
-          set -o pipefail
-          npm run test:unit 2>&1 | tee unit-tests.log
-        continue-on-error: true
-
-      - name: Publish unit test summary
-        if: always()
-        run: |
-          echo "### Unit Test Results (Node ${{ matrix.node-version }} on ${{ matrix.os }})" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          cat unit-tests.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.unit_step.outcome }}" != "success" ]; then
-            exit 1
-          fi
+        run: npm run test:unit
 
   docker-tests:
     name: Docker Integration Tests (Live Daemon)
@@ -107,28 +92,10 @@ jobs:
         run: |
           docker version
           docker info
-          docker pull node:18-alpine
           docker pull node:20-alpine
 
       - name: Run Docker foundation and verifier test suite
-        id: docker_step
-        run: |
-          set -o pipefail
-          npm run test:docker 2>&1 | tee docker-tests.log
-        continue-on-error: true
-
-      - name: Publish Docker test summary
-        if: always()
-        run: |
-          echo "### Docker Integration Test Results" >> $GITHUB_STEP_SUMMARY
-          echo '```text' >> $GITHUB_STEP_SUMMARY
-          cat docker-tests.log >> $GITHUB_STEP_SUMMARY
-          echo '```' >> $GITHUB_STEP_SUMMARY
-          if [ "${{ steps.docker_step.outcome }}" != "success" ]; then
-            echo "::error::Docker integration tests failed. Check summary above."
-            docker ps -a
-            exit 1
-          fi
+        run: npm run test:docker
 
   e2e-acceptance:
     name: End-to-End Acceptance Tests

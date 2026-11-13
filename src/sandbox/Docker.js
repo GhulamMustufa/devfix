@@ -110,18 +110,14 @@ class DockerSandbox {
       // ignore if container does not exist
     }
 
+    if (!this.hostMountPath) {
+      this._isEphemeral = true;
+      this.hostMountPath = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'devfix-sandbox-'));
+    }
+
     const realMountPath = await this._validateHostMountPath();
     const args = this.buildRunArgs(realMountPath);
     await execFileAsync('docker', args);
-
-    // Ensure /app and /tmp are writable by non-root user in ephemeral containers
-    if (!realMountPath && this.user !== '0' && this.user !== '0:0' && this.user !== 'root') {
-      await execFileAsync('docker', [
-        'exec', '-u', '0', this.name, 'sh', '-c',
-        'mkdir -p /app /tmp && chown "$1" /app && chmod 1777 /tmp',
-        '_', this.user
-      ]);
-    }
   }
 
   async stop() {
@@ -130,6 +126,13 @@ class DockerSandbox {
       await execFileAsync('docker', ['rm', '-f', this.name]);
     } catch {
       // ignore cleanup errors
+    }
+    if (this._isEphemeral && this.hostMountPath) {
+      try {
+        await fs.promises.rm(this.hostMountPath, { recursive: true, force: true });
+      } catch {
+        // ignore cleanup errors
+      }
     }
   }
 
