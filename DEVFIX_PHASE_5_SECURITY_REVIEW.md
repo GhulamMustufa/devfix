@@ -82,3 +82,4 @@ All workflows and automated scripts were audited against the GitHub Actions Secu
     - Explicitly blocks patterns matching `tests/`, `artifacts/`, `docs/`, `.env`, `*.bak`, `*.tgz`.
     - Tarball extraction confirms zero leaked files.
 - **Status:** **PASS (Mitigated)**
+

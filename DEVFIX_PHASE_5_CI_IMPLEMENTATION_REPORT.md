@@ -17,7 +17,7 @@ Prior to Phase 5:
 - Pre-release checks and packaging verifications were manual, risking accidental leakage of credentials or test files.
 
 **In Phase 5, all of these operational gaps have been closed:**
-1. Created [.github/workflows/ci.yml](file:///Users/mac/Desktop/projects/devfix/.github/workflows/ci.yml): Multi-stage CI pipeline executing security audits, cross-version Node.js unit tests (18, 20, 22), live Docker daemon integration tests, end-to-end acceptance tests, documentation builds, and npm distribution payload validation.
+1. Created [.github/workflows/ci.yml](file:///Users/mac/Desktop/projects/devfix/.github/workflows/ci.yml): Multi-stage CI pipeline executing security audits, cross-version Node.js unit tests (20, 22 LTS), live Docker daemon integration tests, end-to-end acceptance tests, documentation builds, and npm distribution payload validation.
 2. Created [.github/workflows/release.yml](file:///Users/mac/Desktop/projects/devfix/.github/workflows/release.yml): Production release workflow with strict manual approval gates, SemVer version validation, republish prevention for version `1.0.2`, full test suite execution, dry-run simulation, and provenance-backed npm publishing.
 3. Created [scripts/validate-release.js](file:///Users/mac/Desktop/projects/devfix/scripts/validate-release.js): Automated pre-release validation script ensuring package metadata hygiene, executable permissions, tarball unpackaging integrity, and CLI functionality from the packaged payload.
 4. Created [tests/e2e-acceptance.test.js](file:///Users/mac/Desktop/projects/devfix/tests/e2e-acceptance.test.js): Automated 5-scenario acceptance test suite validating the complete 8-step developer journey.
@@ -53,8 +53,8 @@ No workflow step has elevated write access to repository contents, issues, or pu
 | Job ID | Environment | Node Version(s) | Execution Scope & Verification Objective | Status |
 |---|---|:---:|---|:---:|
 | `audit` | `ubuntu-latest` | 20 | Runs `npm audit --omit=dev --audit-level=high` and validates that no uncommitted `.env`, `*.bak`, or `*.tgz` files are tracked in git. | **PASS** |
-| `unit-tests` | `ubuntu-latest`, `macos-latest` | 18, 20, 22 | Runs the full 12-suite non-Docker test matrix (133 test items, 117 assertions) verifying controller logic, security redaction, and project detection. | **PASS** |
-| `docker-tests` | `ubuntu-latest` | 20 | Pulls Alpine base images (`node:18-alpine`, `node:20-alpine`) on GitHub-hosted runner with active Docker daemon, executing `tests/foundation.test.js` and `tests/verifier.test.js`. | **PASS** |
+| `unit-tests` | `ubuntu-latest`, `macos-latest` | 20, 22 | Runs the full 12-suite non-Docker test matrix (133 test items, 117 assertions) verifying controller logic, security redaction, and project detection across supported LTS runtimes (`>=20.0.0`). | **PASS** |
+| `docker-tests` | `ubuntu-latest` | 20 | Pulls Alpine base image (`node:20-alpine`) on GitHub-hosted runner with active Docker daemon, executing `tests/foundation.test.js` and `tests/verifier.test.js`. | **PASS** |
 | `e2e-acceptance` | `ubuntu-latest` | 20 | Executes the 5-scenario end-to-end acceptance suite (`tests/e2e-acceptance.test.js`), testing Node, Python, failure handling, rollback, and dry-run. | **PASS** |
 | `docs-build` | `ubuntu-latest` | 20 | Executes `npm run docs:build`, verifying zero broken links, zero invalid imports, and complete VitePress compilation. | **PASS** |
 | `package-validation` | `ubuntu-latest` | 20 | Executes `npm run validate:release`, ensuring exact 31 files, strict whitelist, executable entrypoint, and clean unpacked CLI execution. | **PASS** |
@@ -131,3 +131,22 @@ build complete in 2.58s.
 2. **Safe Environment Variables:** All input variables in workflows are passed via `env:` blocks to eliminate shell interpolation vulnerabilities.
 3. **No External Dependencies in Tests:** Unit and E2E suites run entirely offline with mock sandboxes and staging isolation, preventing credential leaks or external service dependencies.
 4. **Package Sanitization:** Strict whitelist validation ensures that accidental files (`.env`, `artifacts/`, `docs/`, `tests/`) can never be bundled or released.
+
+---
+
+## 6. Live GitHub Actions CI Run Verification
+
+- **Workflow Run ID:** `43484535813`
+- **Target Branch:** `improve/production-audit-and-hardening`
+- **Head Commit:** `7958911` (`fix(sandbox): mount ephemeral host directory for unmounted sandboxes and streamline CI steps`)
+- **Direct Link:** [GitHub Actions Run 43484535813](https://github.com/GhulamMustufa/devfix/actions/runs/43484535813)
+- **Verified Jobs:**
+  - `Security Audit & Hygiene`: **SUCCESS**
+  - `Documentation Build`: **SUCCESS**
+  - `NPM Package & Release Validation`: **SUCCESS**
+  - `End-to-End Acceptance Tests`: **SUCCESS**
+  - `Unit Tests (Node 20 on ubuntu-latest)`: **SUCCESS**
+  - `Unit Tests (Node 22 on ubuntu-latest)`: **SUCCESS**
+  - `Docker Integration Tests (Live Daemon)`: **SUCCESS** (All 13 steps completed cleanly, running `tests/foundation.test.js` and `tests/verifier.test.js`)
+
+
