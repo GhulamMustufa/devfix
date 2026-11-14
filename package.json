@@ -9,14 +9,20 @@
   "files": [
     "bin",
     "src",
-    "README.md"
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "scripts": {
     "test": "node --test tests/*.test.js",
+    "test:unit": "node --test tests/adversarial.test.js tests/agent.test.js tests/cancellation.test.js tests/cli.test.js tests/multi-verifier.test.js tests/project-detector.test.js tests/provider.test.js tests/security.test.js tests/state-change.test.js tests/ux-telemetry.test.js tests/verifier-redaction.test.js tests/workspace.test.js",
+    "test:docker": "node --test tests/foundation.test.js tests/verifier.test.js",
+    "test:e2e": "node --test tests/e2e-acceptance.test.js",
+    "validate:release": "node scripts/validate-release.js",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
-    "prepare": "husky"
+    "prepare": "[ -d .git ] && husky || true"
   },
   "keywords": [
     "ai",
@@ -37,6 +43,9 @@
     "url": "https://github.com/GhulamMustufa/devfix/issues"
   },
   "homepage": "https://devfix.ghulam-mustafa.com",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "chalk": "^5.6.2",

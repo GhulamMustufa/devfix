@@ -14,17 +14,17 @@ hero:
       link: https://github.com/GhulamMustufa/devfix
 
 features:
-  - title: Self-Verifying Fixes
-    details: Doesn't just guess. It actively runs your tests (like npm run build) to mathematically prove the environment is fixed.
-  - title: Secure & Sandboxed
-    details: AI shell access is dangerous. DevFix isolates all actions inside a secure Docker container, protecting your laptop.
-  - title: Language Agnostic
-    details: Automatically detects and supports Node.js, TypeScript, and Python without complex configuration.
+  - title: Deterministic Verification
+    details: Doesn't just guess. It executes your actual test suites and build commands (npm test, pytest) to prove the fix works before completing.
+  - title: Non-Destructive Staging
+    details: Repairs take place in an isolated staging workspace. You review a unified diff and explicitly approve changes before anything touches your project.
+  - title: Multi-Runtime & Monorepo Support
+    details: Automatically detects Node.js (npm, pnpm, yarn, bun), Python (pip, uv, poetry), version constraints, and monorepo workspaces.
 ---
 
 <div style="margin-top: 4rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
   <img src="/ascii-banner.png" alt="DevFix Terminal Banner" style="border-radius: 8px; max-width: 100%;" />
-  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">The DevFix command-line interface.</p>
+  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">Autonomous Local Development Troubleshooter.</p>
 </div>
 
 ## The "It Works on My Machine" Solver
@@ -40,19 +40,24 @@ features:
   </div>
 </div>
 
-DevFix is an AI-powered CLI tool designed to solve the headache of broken local environments. 
+DevFix is an AI-powered developer tool designed to eliminate the headache of broken local development environments.
 
-<div style="margin-top: 2rem; margin-bottom: 2rem; display: flex; flex-direction: column; align-items: center;">
-  <img src="/inspect-command.png" alt="DevFix Inspect Command Output" style="border-radius: 8px; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1); max-width: 70%; border: 1px solid var(--vp-c-divider);" />
-  <p style="font-size: 0.85em; font-style: italic; color: var(--vp-c-text-2); margin-top: 0.5rem; text-align: center;">The <code>devfix inspect .</code> command instantly analyzing a broken project's runtime, package manager, and sandbox requirements.</p>
-</div>
+```bash
+# Diagnose and fix a project with deterministic verification
+devfix fix . --verify "npm test"
 
-When a project refuses to build, dependencies conflict, or native binaries are missing, you shouldn't have to spend hours Googling cryptic stack traces. You simply run `devfix inspect .`, and the agent will:
+# Or run multi-step verification in dry-run mode
+devfix fix . --verify "npm run build" --verify "npm test" --dry-run
+```
 
-1. **Observe:** Inspect configurations, package managers, and runtimes without executing code.
-2. **Execute:** Spin up a secure Docker sandbox and attempt to build the project.
-3. **Diagnose:** Analyze stack traces and missing dependencies deeply.
-4. **Fix:** Interactively patch code, install missing packages, and re-run until the environment is healthy.
+When a project refuses to build, dependencies conflict, or native configurations fail:
+
+1. **Detect:** DevFix scans runtime versions, package managers, lockfiles, and monorepos in read-only mode (`devfix inspect .`).
+2. **Stage:** Duplicates project files into a disposable staging workspace, strictly excluding secrets and private keys.
+3. **Isolate:** Spawns a hardened Docker container (`--user 1000:1000`, `--cap-drop=ALL`, `--network=none`).
+4. **Repair:** The AI agent diagnoses errors, patches files, and tests hypotheses.
+5. **Verify:** External verifiers prove success before declaring the issue resolved.
+6. **Review & Rollback:** Presents a unified diff for developer confirmation and creates pre-commit snapshots for instant rollback (`devfix rollback`).
 
 ## Open Source & Evolving
 

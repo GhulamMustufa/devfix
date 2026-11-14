@@ -59,8 +59,8 @@ test('Deterministic Verifier Layer', async (t) => {
     
     // Check if process was cleaned up
     // Wait a little for cleanup
-    await new Promise(r => setTimeout(r, 500));
-    const checkPs = await sandbox.executeHostCommand('ps | grep "node -e" | grep -v grep || true');
+    await new Promise(r => setTimeout(r, 600));
+    const checkPs = await sandbox.executeHostCommand('ps | grep "[n]ode -e" || true');
     assert.strictEqual(checkPs.stdout.trim(), '');
   });
 
@@ -109,20 +109,24 @@ test('Deterministic Verifier Layer', async (t) => {
   });
 
   await t.test('HTTP: Capability failure reported', async () => {
-    // Mess up the commands so capability check fails
-    await sandbox.executeHostCommand(`mv /usr/bin/wget /usr/bin/wget_bak && mv /usr/local/bin/node /usr/local/bin/node_bak`);
-    
-    const res = await verify(sandbox, {
+    // Execute inside sandbox with empty PATH so capability check detects no HTTP client
+    const restrictedSandbox = {
+      executeArgs: (script, args, timeoutMs) => {
+        return sandbox.executeArgs(`PATH="" ${script}`, args, timeoutMs);
+      },
+      execute: (cmd, timeoutMs) => {
+        return sandbox.execute(`PATH="" ${cmd}`, timeoutMs);
+      }
+    };
+
+    const res = await verify(restrictedSandbox, {
       type: 'http',
       url: 'http://127.0.0.1:8084/',
       timeoutMs: 1000
     });
-    
+
     assert.strictEqual(res.success, false);
     assert.strictEqual(res.status, 'HTTP_CLIENT_UNAVAILABLE');
-    
-    // Restore
-    await sandbox.executeHostCommand(`mv /usr/bin/wget_bak /usr/bin/wget && mv /usr/local/bin/node_bak /usr/local/bin/node`);
   });
 
   await sandbox.stop();

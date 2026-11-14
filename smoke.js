@@ -11,13 +11,7 @@ async function runSmokeTest() {
     process.exit(0);
   }
 
-  // Use DeepSeek config. In our `.env` it might be `GEMINI_API_KEY` for open-ai compatible.
-  const apiKey = process.env.LLM_API_KEY || process.env.DEEPSEEK_API_KEY;
-
   const controller = new AgentController({
-    LLM_PROVIDER: 'deepseek',
-    LLM_MODEL: 'deepseek-chat',
-    LLM_API_KEY: apiKey,
     maxIterations: 5 // Small limit for smoke test
   });
 

@@ -23,6 +23,8 @@ export default defineConfig({
     nav: [
       { text: 'Home', link: '/' },
       { text: 'Quick Start', link: '/quickstart' },
+      { text: 'Architecture', link: '/architecture' },
+      { text: 'Security', link: '/security' },
       { text: 'Changelog', link: '/changelog' }
     ],
     sidebar: [
@@ -32,6 +34,8 @@ export default defineConfig({
           { text: 'Introduction', link: '/' },
           { text: 'Quick Start', link: '/quickstart' },
           { text: 'CLI Reference', link: '/cli-reference' },
+          { text: 'Architecture', link: '/architecture' },
+          { text: 'Security Model', link: '/security' },
           { text: 'Benchmarks', link: '/benchmarks' },
           { text: 'Improvement Changelog', link: '/changelog' },
           { text: 'Reproduction Guide', link: '/reproduction' },

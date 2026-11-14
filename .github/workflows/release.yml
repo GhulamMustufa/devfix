@@ -1,0 +1,105 @@
+name: DevFix Release Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      target_version:
+        description: 'Target SemVer release version (e.g. 1.1.0)'
+        required: true
+        type: string
+      dry_run:
+        description: 'Execute in dry-run mode (do not publish to npm registry)'
+        required: true
+        type: boolean
+        default: true
+      confirm_release:
+        description: 'Explicit confirmation: I verify all pre-release audits passed and approve publishing.'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  release-audit-and-publish:
+    name: Release Audit & Controlled Publication
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Validate Release Decision & Target Version
+        env:
+          TARGET_VERSION: ${{ inputs.target_version }}
+        run: |
+          echo "Target Release Version: ${TARGET_VERSION}"
+          
+          # Disallow republishing version 1.0.2
+          if [ "${TARGET_VERSION}" = "1.0.2" ]; then
+            echo "ERROR: Version 1.0.2 is already published on npm and cannot be overwritten."
+            exit 1
+          fi
+
+          # Validate SemVer format
+          if ! echo "${TARGET_VERSION}" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; then
+            echo "ERROR: Target version '${TARGET_VERSION}' does not conform to SemVer syntax."
+            exit 1
+          fi
+
+          # Verify package.json version matches target version
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "${PKG_VERSION}" != "${TARGET_VERSION}" ]; then
+            echo "ERROR: package.json version ('${PKG_VERSION}') does not match target release version ('${TARGET_VERSION}')."
+            echo "Please update package.json, CHANGELOG.md, and tag before triggering release."
+            exit 1
+          fi
+
+      - name: Setup Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Install dependencies from lockfile
+        run: npm ci
+
+      - name: Run complete non-Docker test suite
+        run: npm run test:unit
+
+      - name: Pull Docker images and run Docker integration tests
+        run: |
+          docker pull node:18-alpine
+          docker pull node:20-alpine
+          npm run test:docker
+
+      - name: Run End-to-End Acceptance tests
+        run: npm run test:e2e
+
+      - name: Build documentation website
+        run: npm run docs:build
+
+      - name: Run strict pre-release package validation
+        run: npm run validate:release
+
+      - name: Dry-Run Publication Simulation
+        if: ${{ inputs.dry_run }}
+        run: |
+          echo "=== DRY-RUN RELEASE SIMULATION ==="
+          npm publish --dry-run
+          echo "Dry-run validation successful. No changes made to npm registry."
+
+      - name: Publish to NPM Registry
+        if: ${{ !inputs.dry_run && inputs.confirm_release }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          TARGET_VERSION: ${{ inputs.target_version }}
+        run: |
+          echo "=== PUBLISHING DEVFIX v${TARGET_VERSION} TO NPM ==="
+          npm publish --provenance --access public
+          echo "Successfully published devfix@${TARGET_VERSION}"

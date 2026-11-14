@@ -1,39 +1,82 @@
 # Frequently Asked Questions (FAQ)
 
-### How is DevFix different from Cursor, ChatGPT, or Claude?
-Standard LLMs and AI code editors generate text and *hope* that it works, leaving you to manually run the code and paste the errors back to them. **DevFix is a deterministic verifier.** It doesn't just guess; it spins up a secure Docker container, runs your actual build commands, analyzes the terminal output, and mathematically proves the fix works before it stops iterating.
+### How is DevFix different from Cursor, ChatGPT, or GitHub Copilot?
+Standard LLMs and AI code editors generate code suggestions and *hope* that they work, leaving you to manually run the code, hit a compilation error, and paste the traceback back to the chat. 
 
-### Is it safe to run on my local machine?
-**Yes.** Security is our highest priority. The LLM agent is not allowed to run bash commands directly on your laptop. Instead, every command (like `npm install` or `python main.py`) is executed inside an ephemeral, strictly isolated Docker sandbox with `no-new-privileges` enabled. Your host filesystem and global binaries are never touched.
+**DevFix is a deterministic autonomous verifier.** It doesn't just guess; it spins up a secure, isolated staging sandbox, inspects the codebase, applies targeted edits, executes your actual build/test commands, and proves that the fix works before completing its work.
 
-### What languages and frameworks does it support?
-Currently, the `ProjectDetector` natively recognizes and configures sandboxes for **Node.js** and **Python** environments. However, the core verification architecture is entirely language-agnostic. As long as the error can be reproduced in a Docker container via bash, the agent can troubleshoot it.
+---
 
-### Do I have to pay to use DevFix?
-The DevFix CLI itself is 100% free and open-source (MIT License). However, because it relies on a Large Language Model to power its reasoning engine, you must provide your own API key. You will only pay the standard token costs to your chosen provider (e.g., OpenAI, DeepSeek, or Groq). 
+### Is DevFix safe to run on my local machine?
+**Yes.** DevFix enforces strict defense-in-depth security:
+1. **Isolated Staging:** DevFix **never** mounts your real project directory as a writable Docker volume. Repairs happen inside a temporary staging copy.
+2. **Explicit Approval:** You are presented with a unified diff and must explicitly approve changes (`[y/N]` or `--yes`) before anything is written back to your project.
+3. **Rollback Snapshots:** Before touching any file, DevFix saves a rollback snapshot (`devfix rollback`).
+4. **Hardened Docker Containers:** Containers execute as a non-root user (`--user 1000:1000`), drop all Linux capabilities (`--cap-drop=ALL`), disable network by default (`--network=none`), and enforce strict CPU and memory limits.
 
-### What if I don't use OpenAI?
-DevFix uses a flexible LLM Provider architecture. By default, it supports DeepSeek, OpenAI, Groq, and OpenRouter. You can easily switch providers by setting environment variables in your terminal:
+---
+
+### What languages and package managers are supported?
+DevFix features deep environment detection for:
+- **Node.js:** npm, pnpm, yarn, bun, Corepack (`packageManager` declarations in `package.json`), TypeScript (`tsconfig.json`), and monorepos (`pnpm-workspace.yaml`, `lerna.json`, `workspaces` arrays).
+- **Python:** pip, uv, Poetry, Pipenv, Conda, and virtual environments (`.venv`, `venv`).
+- **Mixed / Polyglot:** Detects repositories containing both frontend and backend stacks.
+
+---
+
+### Can DevFix fix my project if it requires downloading new dependencies?
+By default, DevFix disables container networking (`--network=none`) to protect you from untrusted data exfiltration. If your project genuinely needs to fetch new packages from npm or PyPI, simply provide the `--allow-network` flag:
+
 ```bash
-export LLM_PROVIDER="groq"
-export LLM_MODEL="llama3-70b-8192"
-export LLM_API_KEY="gsk_..."
+devfix fix . --verify "npm test" --allow-network
 ```
 
-### Can it fix logic bugs in my application code?
-While the agent *can* use its `patch` tool to rewrite source code files, DevFix is primarily optimized for **Environment and Configuration failures** (e.g., missing `.env` variables, port conflicts, missing system dependencies, broken `package.json` scripts, and module resolution errors). It is designed to solve the *"It works on my machine"* syndrome, not necessarily to write your business logic.
+---
 
-### How does the Docker sandboxing actually work?
-DevFix creates an ephemeral container based on the runtime detected in your project (e.g., `node:20-alpine` or `python:3.9-slim`). It mounts your project directory as a read-write volume, but drops all root privileges using Docker's `--security-opt no-new-privileges` flag. When the agent is finished verifying the fix, the container is instantly destroyed, leaving your host machine safe and untainted.
+### What happens if I don't like the changes DevFix made?
+You can revert them immediately! Every approved repair creates a rollback snapshot. To restore your project to its exact pre-repair state:
 
-### Will it delete my code or ruin my project?
-No. DevFix is designed with extreme safety in mind. It cannot execute destructive system commands on your host filesystem. If it modifies a file using its internal patch tool, you can easily review the changes using `git diff` before committing them, as DevFix runs locally in your workspace.
+```bash
+# Restore latest repair
+devfix rollback
 
-### How long does a typical repair take?
-Repair times vary based on the complexity of the issue and the speed of your chosen LLM. On average, a simple configuration fix (like a missing environment variable or port conflict) takes around **5–15 seconds** and 1 to 2 iterations. Complex cascading failures may take up to 60 seconds.
+# Or view history and restore a specific repair
+devfix history
+devfix rollback <rollbackId>
+```
 
-### Can I use my own local LLM (like Ollama)?
-Yes! Because DevFix supports a `custom` LLM provider, you can point it to any OpenAI-compatible local API endpoint. Simply set `export LLM_PROVIDER="custom"` and `export LLM_BASE_URL="http://localhost:11434/v1"` (for Ollama) along with your local model name. This allows you to run DevFix entirely offline and for free!
+DevFix also checks if files were edited after the repair before rolling back, preventing accidental overwriting of recent work.
+
+---
+
+### What LLM providers can I use?
+DevFix supports:
+- **Google Gemini:** `LLM_PROVIDER="gemini"` with `gemini-3.8-flash` (recommended).
+- **DeepSeek:** `LLM_PROVIDER="deepseek"` with `deepseek-chat`.
+- **OpenAI:** `LLM_PROVIDER="openai"` with `gpt-4o` or `gpt-4o-mini`.
+- **Groq:** `LLM_PROVIDER="groq"` with `llama-3.3-70b-versatile`.
+- **Ollama (Free / Local):** `LLM_PROVIDER="ollama"` with local models like `llama3.2` — no API key needed!
+- **Custom Local Endpoints:** Any OpenAI-compatible server (vLLM, LM Studio, LocalAI).
+
+---
+
+### What does DevFix NOT currently support?
+To maintain transparency and trust:
+1. **Windows Native Containers:** DevFix requires Docker Desktop with Linux containers (WSL2 on Windows).
+2. **GUI / Desktop Applications:** DevFix is optimized for headless backend, web, CLI, library, and microservice builds, not native desktop UI frameworks.
+3. **Unbounded Code Generation:** DevFix is designed to diagnose and repair broken environments and configuration errors, not write entire application features from scratch.
+4. **Offline Package Installation without `--allow-network`:** If a missing package is not cached locally, network access must be explicitly permitted.
+
+---
+
+### Can I opt out of telemetry?
+**Yes.** DevFix only records local trajectory logs to help you review the agent's work. It never transmits telemetry to external analytics servers. You can completely disable local run recording by passing `--no-telemetry` or setting `DEVFIX_TELEMETRY=0` or `DO_NOT_TRACK=1`.
+
+---
 
 ### What happens if the AI gets stuck in an infinite loop?
-DevFix has built-in loop prevention and strict token limits. It caps the maximum number of iterations the agent is allowed to make (the default is 10). If the agent cannot mathematically prove that the issue is fixed within that limit, it gracefully halts and returns a `MAX_ITERATIONS_EXCEEDED` error, preserving your API credits and time.
+DevFix enforces strict limits:
+- Maximum 15 iterations per repair run.
+- Loop and duplicate action detection (halts if the agent repeats identical tool calls).
+- Command-level execution timeouts.
+- Signal cancellation: pressing `Ctrl+C` cleanly aborts the agent immediately without corrupting your files.

@@ -9,14 +9,48 @@ export class ProjectFormatter {
     out += `  ${context.language}\n\n`;
 
     out += chalk.bold('Runtime:\n');
-    out += `  ${context.runtime}\n\n`;
+    const runtimeStr = context.runtimeVersion
+      ? `${context.runtime} (${context.runtimeVersion})`
+      : context.runtime;
+    out += `  ${runtimeStr}\n\n`;
 
     out += chalk.bold('Package Manager:\n');
-    out += `  ${context.packageManager}\n\n`;
+    let pmStr = context.packageManager;
+    if (context.packageManagerVersion) {
+      pmStr += ` (${context.packageManagerVersion})`;
+    }
+    if (context.lockfile) {
+      pmStr += ` via ${context.lockfile}`;
+    }
+    out += `  ${pmStr}\n\n`;
+
+    if (context.isMonorepo) {
+      out += chalk.bold('Monorepo / Workspaces:\n');
+      const wsStr = Array.isArray(context.workspaces) && context.workspaces.length > 0
+        ? context.workspaces.join(', ')
+        : 'Enabled';
+      out += `  ${chalk.cyan(wsStr)}\n\n`;
+    }
+
+    if (context.hasVirtualEnv) {
+      out += chalk.bold('Virtual Environment:\n');
+      out += `  ${chalk.cyan(context.virtualEnvPath || 'Detected')}\n\n`;
+    }
+
+    out += chalk.bold('Docker Base Image:\n');
+    out += `  ${chalk.green(context.dockerImage || 'node:20-alpine')}\n\n`;
+
+    if (context.conflicts && context.conflicts.length > 0) {
+      out += chalk.bold(chalk.yellow('Warnings / Conflicts:\n'));
+      context.conflicts.forEach((c) => {
+        out += chalk.yellow(`  ⚠ ${c}\n`);
+      });
+      out += '\n';
+    }
 
     out += chalk.bold('Project Files:\n');
     if (context.files.length > 0) {
-      context.files.forEach(f => out += `  ${f}\n`);
+      context.files.forEach((f) => (out += `  ${f}\n`));
     } else {
       out += `  None identified\n`;
     }
@@ -25,7 +59,7 @@ export class ProjectFormatter {
     out += chalk.bold('Detected Commands:\n');
     const commandKeys = Object.keys(context.commands);
     if (commandKeys.length > 0) {
-      commandKeys.forEach(cmd => {
+      commandKeys.forEach((cmd) => {
         out += `  ${cmd}: ${context.commands[cmd]}\n`;
       });
     } else {
