@@ -2,7 +2,16 @@
 
 All notable engineering changes to DevFix on the improvement track (`improve/production-audit-and-hardening`) are recorded here. Historical hackathon benchmark evolution remains preserved in [docs/changelog.md](file:///Users/mac/Desktop/projects/devfix/docs/changelog.md) and `artifacts/phase-3e` through `artifacts/phase-4f`.
 
-## [Unreleased — Phase 4: Developer UX, Telemetry & Documentation]
+## [1.1.0] - 2026-11-16
+
+### Phase 5: Release Automation, CI/CD & Final Verification
+- **Automated GitHub Actions CI (`.github/workflows/ci.yml`):** Implemented multi-stage CI pipeline running security audits, cross-version unit tests on Node.js 20 & 22 LTS (Ubuntu) and Node.js 20 (macOS), documentation builds, package tarball validation, and live Docker integration tests.
+- **Production Release Pipeline (`.github/workflows/release.yml`):** Added controlled workflow dispatch pipeline with manual approvals, version overwrite protection, automated tests, and provenance-backed npm publishing.
+- **Automated Pre-Release Validator (`scripts/validate-release.js`):** Validates package structure, executable permissions, and strict 31-file npm distribution whitelist before publishing.
+- **End-to-End Acceptance Test Suite (`tests/e2e-acceptance.test.js`):** Built 5 realistic user-journey test scenarios covering Node.js, Python, unrepairable projects, post-repair rollback conflicts, and dry-run mode.
+- **Ephemeral Host Mounts for Non-Root Containers (`src/sandbox/Docker.js`):** Hardened Docker sandbox to automatically mount ephemeral directories on the host, ensuring non-root users (`1000:1000`) have full native write access to `/app` without requiring root capabilities under `--cap-drop=ALL`.
+
+### Phase 4: Developer UX, Telemetry & Documentation
 
 ### Developer Experience & Observability
 - **Machine-Readable `--json` Output:** Added `--json` flag to `devfix fix`, `devfix inspect`, `devfix doctor`, `devfix rollback`, `devfix history`, and `devfix diff`. Suppresses terminal spinners and outputs structured JSON for CI/CD pipelines, automation scripts, and external tools.

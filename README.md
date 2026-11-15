@@ -3,10 +3,11 @@
   <p><strong>The open-source autonomous troubleshooter that diagnoses, patches, and verifies broken local development environments.</strong></p>
   
   <p>
+    <a href="https://www.npmjs.com/package/devfix"><img src="https://img.shields.io/npm/v/devfix?style=flat-square&color=blue" alt="npm version" /></a>
     <a href="https://devfix.ghulam-mustafa.com"><img src="https://img.shields.io/badge/docs-devfix.ghulam--mustafa.com-blue?style=flat-square" alt="Documentation" /></a>
     <a href="https://github.com/GhulamMustufa/devfix/blob/main/LICENSE"><img src="https://img.shields.io/badge/license-MIT-green?style=flat-square" alt="License" /></a>
-    <img src="https://img.shields.io/badge/node-%3E%3D18.0.0-brightgreen?style=flat-square" alt="Node Version" />
-    <img src="https://img.shields.io/badge/tests-121%20passing-success?style=flat-square" alt="Tests" />
+    <img src="https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen?style=flat-square" alt="Node Version" />
+    <img src="https://img.shields.io/badge/tests-133%20passing-success?style=flat-square" alt="Tests" />
   </p>
 </div>
 
