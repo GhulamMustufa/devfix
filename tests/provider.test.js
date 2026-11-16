@@ -44,7 +44,7 @@ describe('LLMProvider & Gemini Configuration', () => {
       () => {
         const resolved = resolveProviderConfig();
         assert.strictEqual(resolved.providerType, 'gemini');
-        assert.strictEqual(resolved.modelName, 'gemini-3.8-flash');
+        assert.strictEqual(resolved.modelName, 'gemini-3.5-flash');
         assert.strictEqual(resolved.apiKey, 'AIzaTestKey12345678901234567890');
         assert.strictEqual(resolved.baseURL, 'https://generativelanguage.googleapis.com/v1beta/openai');
       }
@@ -62,7 +62,7 @@ describe('LLMProvider & Gemini Configuration', () => {
       () => {
         const provider = new LLMProvider();
         assert.strictEqual(provider.providerType, 'gemini');
-        assert.strictEqual(provider.modelName, 'gemini-3.8-flash');
+        assert.strictEqual(provider.modelName, 'gemini-3.5-flash');
         assert.strictEqual(provider.apiKey, 'AIzaGeminiKey12345678901234567890');
       }
     );

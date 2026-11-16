@@ -142,11 +142,17 @@ export class AgentController {
         let didStateChange = false;
 
         if (response.toolCalls && response.toolCalls.length > 0) {
-          messageData.tool_calls = response.toolCalls.map(tc => ({
-            id: tc.id,
-            type: 'function',
-            function: { name: tc.name, arguments: tc.arguments }
-          }));
+          messageData.tool_calls = response.toolCalls.map(tc => {
+            const entry = {
+              id: tc.id,
+              type: 'function',
+              function: { name: tc.name, arguments: tc.arguments }
+            };
+            if (tc.extra_content) {
+              entry.extra_content = tc.extra_content;
+            }
+            return entry;
+          });
           messages.push(messageData);
 
           for (const tc of response.toolCalls) {

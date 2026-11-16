@@ -8,7 +8,7 @@ const DEFAULT_REQUEST_TIMEOUT_MS = 30000;
 export const DEFAULT_MODELS = {
   deepseek: 'deepseek-chat',
   openai: 'gpt-4o-mini',
-  gemini: 'gemini-3.8-flash',
+  gemini: 'gemini-3.5-flash',
   groq: 'llama-3.3-70b-versatile',
   openrouter: 'openai/gpt-4o-mini',
   ollama: 'llama3.2',
@@ -189,6 +189,7 @@ export class LLMProvider {
               typeof tc.function?.arguments === 'string'
                 ? tc.function.arguments
                 : JSON.stringify(tc.function?.arguments ?? {}),
+            extra_content: tc.extra_content,
           })),
           usage: response.usage
         };
